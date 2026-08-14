@@ -13,3 +13,12 @@ export type {
   WorkflowStatus,
   WorkflowState,
 } from './workflow';
+
+export { replay, NonDeterminismError } from './replay';
+export type {
+  WorkflowContext,
+  WorkflowFn,
+  WorkflowCommand,
+  ReplayStatus,
+  ReplayResult,
+} from './replay';

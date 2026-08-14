@@ -89,23 +89,48 @@ and not yet completed at the moment of the kill.
 
 ## M2 proof: workflow state derived purely from events
 
-`pnpm demo:m2` runs a 3-activity workflow (reserve → charge → ship) to
-completion through a real M1 `Worker`, then reconstructs its final state
-by folding `workflow_events` from `seq` 1 — the state was never read from
-anywhere else. Design reasoning (why the fold has to be pure, why
-`workflow_executions.status` is a cache and not a second source of truth,
-why append-and-enqueue is one transaction) is in
+M2 proved that workflow state can always be reconstructed purely by
+folding `workflow_events` from `seq` 1 — never stored or mutated
+directly — using a hardcoded reserve → charge → ship sequence (no
+decision engine existed yet). Design reasoning (why the fold has to be
+pure, why `workflow_executions.status` is a cache and not a second source
+of truth, why append-and-enqueue is one transaction) is in
 [`docs/02-event-store.md`](./docs/02-event-store.md).
 
+**Superseded by M3**: the hardcoded sequence this milestone's demo relied
+on no longer exists in the codebase — M3 replaced it with real workflow
+code and a genuine replay engine (same event store and fold underneath,
+unchanged). `pnpm demo:m2` isn't runnable anymore for that reason; M3's
+demo below proves the same event-sourcing guarantee and more.
+
+## M3 proof: deterministic replay survives a mid-workflow crash
+
+Workflows are authored as ordinary `async function`s
+(`defineWorkflow`/`defineActivity`). `pnpm demo:m3` starts a reserve →
+charge → ship workflow, `kill -9`'s the worker process right after
+`reserve` completes and before `charge` starts, starts a completely fresh
+process, and proves the workflow still reaches `COMPLETED` — with
+`reserve`'s activity function _provably_ executed exactly once (via an
+independent execution counter, not just event-log shape). Design
+reasoning (why replay means re-running the function from scratch every
+time, how `scheduleActivity` makes that deterministic, why microtask
+draining is a legitimate purity boundary and not a loophole, why
+`NonDeterminismError` is a distinct outcome from a workflow failure) is
+in [`docs/03-replay.md`](./docs/03-replay.md).
+
 ```
-== KaryaKram M2 demo ==
+== KaryaKram M3 demo ==
 
 1. Resetting DB...
 2. Starting workflow (reserve -> charge -> ship)...
-   workflowId = 47bb7230-7a1e-46ae-a603-a1122701b6d5
-3. Running a worker until the workflow completes...
+   workflowId = 06cd38f6-9414-4ddb-86f9-b8688dac8aae
+3. Starting the reaper and worker process #1...
+4. Waiting for 'reserve' to complete...
+5. Killing worker process #1 (pid 172453) with SIGKILL...
+6. Starting a fresh worker process #2...
+7. Waiting for the workflow to complete via the fresh worker...
 
-4. Event log (workflow_events, seq order):
+8. Event log (workflow_events, seq order):
    1. WorkflowStarted
    2. ActivityScheduled (reserve)
    3. ActivityCompleted
@@ -115,17 +140,16 @@ why append-and-enqueue is one transaction) is in
    7. ActivityCompleted
    8. WorkflowCompleted
 
-5. State reconstructed purely by folding the log above:
-   status: COMPLETED
-   activity[2] reserve: COMPLETED
-   activity[4] charge: COMPLETED
-   activity[6] ship: COMPLETED
+9. Activity execution counts (proves reserve never re-ran):
+   reserve: 1
+   charge:  1
+   ship:    1
 
-PASS: workflow completed end to end, state derived purely from events.
+PASS: workflow completed after a mid-workflow kill -9, 'reserve' executed exactly once despite the crash.
 ```
 
 ## Status
 
-M0, M1, and M2 complete. See
+M0 through M3 complete. See
 [`docs/plans/README.md`](./docs/plans/README.md) for the full milestone
 index.

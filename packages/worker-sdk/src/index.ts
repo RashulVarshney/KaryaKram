@@ -11,3 +11,17 @@ export { resolveWorkerConfig } from './config';
 export type { WorkerConfig, WorkerConfigInput } from './config';
 
 export { generateWorkerId, formatWorkerId } from './workerId';
+
+export { defineWorkflow, defineActivity } from './authoring';
+export type {
+  WorkflowDefinition,
+  AnyWorkflowDefinition,
+  ActivityFn,
+  ActivityDefinition,
+  AnyActivityDefinition,
+} from './authoring';
+
+export { startWorkflow } from './startWorkflow';
+
+export { createWorkflowReplayHandler } from './workflowReplayHandler';
+export { createActivityHandler } from './activityHandler';

@@ -18,7 +18,7 @@
     "db:migrate": "pnpm --filter @karyakram/db run migrate:up",
     "db:rollback": "pnpm --filter @karyakram/db run migrate:down",
     "demo:m1": "pnpm --filter @karyakram/worker-sdk run demo",
-    "demo:m2": "pnpm --filter @karyakram/worker-sdk run demo:m2"
+    "demo:m3": "pnpm --filter @karyakram/worker-sdk run demo:m3"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

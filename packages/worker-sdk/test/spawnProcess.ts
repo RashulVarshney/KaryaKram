@@ -19,7 +19,12 @@ export interface SpawnedProcess {
   waitForReady: () => Promise<void>;
 }
 
-function spawnTsx(script: string, env: NodeJS.ProcessEnv, readyMarker: string): SpawnedProcess {
+function spawnTsx(
+  script: string,
+  env: NodeJS.ProcessEnv,
+  readyMarker: string,
+  readyCount = 1,
+): SpawnedProcess {
   const child = spawn(process.execPath, ['--import', TSX_LOADER, script], {
     cwd: WORKER_SDK_DIR,
     env,
@@ -36,7 +41,8 @@ function spawnTsx(script: string, env: NodeJS.ProcessEnv, readyMarker: string): 
     return new Promise((resolve, reject) => {
       const start = Date.now();
       const check = (): void => {
-        if (logs.some((l) => l.includes(readyMarker))) {
+        const count = logs.filter((l) => l.includes(readyMarker)).length;
+        if (count >= readyCount) {
           resolve();
           return;
         }
@@ -104,6 +110,31 @@ export function spawnReaper(options: SpawnReaperOptions): SpawnedProcess {
       REAPER_INTERVAL_MS: String(options.intervalMs ?? 1_000),
     },
     '"msg":"reaper starting"',
+  );
+}
+
+export interface SpawnAppOptions {
+  databaseUrl: string;
+  workerId: string;
+  leaseSeconds?: number;
+  heartbeatIntervalMs?: number;
+  pollIntervalMs?: number;
+}
+
+/** Spawns the reserve->charge->ship example app (both an activity worker and a workflow-replay worker in one process). */
+export function spawnReserveChargeShipApp(options: SpawnAppOptions): SpawnedProcess {
+  return spawnTsx(
+    'src/bin/reserve-charge-ship-app.ts',
+    {
+      ...process.env,
+      DATABASE_URL: options.databaseUrl,
+      WORKER_ID: options.workerId,
+      LEASE_SECONDS: String(options.leaseSeconds ?? 10),
+      HEARTBEAT_INTERVAL_MS: String(options.heartbeatIntervalMs ?? 2_000),
+      POLL_INTERVAL_MS: String(options.pollIntervalMs ?? 50),
+    },
+    '"msg":"worker starting"',
+    2, // both the activity worker and the workflow worker log this
   );
 }
 

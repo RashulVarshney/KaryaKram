@@ -1,80 +1,89 @@
 /**
- * M2's hand-scripted 3-activity workflow: reserve -> charge -> ship.
- * There is no decision engine here — the "what comes next" logic is a
- * hardcoded sequence lookup in the activity handler, not derived by
- * replaying workflow code. See docs/02-event-store.md's "driven
- * directly, not through worker replay" section for why that's correct
- * scope for this milestone. Shared by the demo and the end-to-end test
- * so there's exactly one copy of this hardcoded sequence.
+ * M3's reserve -> charge -> ship example: real workflow code, replayed —
+ * replacing M2's hardcoded-switch version. The three activities are
+ * genuinely registered functions (`defineActivity`), and the sequencing
+ * lives entirely in the workflow function's own `await` calls.
  */
-import { randomUUID } from 'node:crypto';
 import type { Pool } from 'pg';
-import { appendEvents, getEvents, withTransaction, type Task } from '@karyakram/db';
-import type { TaskHandler } from '../worker';
+import type { WorkflowContext } from '@karyakram/core';
+import {
+  defineActivity,
+  defineWorkflow,
+  type ActivityDefinition,
+  type AnyActivityDefinition,
+} from '../authoring';
 
-export const ACTIVITY_SEQUENCE = ['reserve', 'charge', 'ship'] as const;
-export type ActivityName = (typeof ACTIVITY_SEQUENCE)[number];
-
-export async function startReserveChargeShipWorkflow(pool: Pool, orderId: string): Promise<string> {
-  const workflowId = randomUUID();
-  await pool.query(
-    `INSERT INTO workflow_executions (id, workflow_type, input, status)
-     VALUES ($1, 'reserve-charge-ship', $2::jsonb, 'RUNNING')`,
-    [workflowId, JSON.stringify({ orderId })],
-  );
-
-  await withTransaction(pool, (client) =>
-    appendEvents(client, {
-      workflowId,
-      events: [
-        { type: 'WorkflowStarted', workflowType: 'reserve-charge-ship', input: { orderId } },
-        { type: 'ActivityScheduled', activityType: ACTIVITY_SEQUENCE[0], input: { orderId } },
-      ],
-    }),
-  );
-
-  return workflowId;
+export interface OrderInput {
+  orderId: string;
 }
 
-/** A real M1 Worker's activity handler — reused, not reimplemented. */
-export function createReserveChargeShipHandler(pool: Pool): TaskHandler {
-  return async (task: Task) => {
-    if (task.scheduledEventSeq === null) {
-      throw new Error(`activity task ${task.id} has no scheduled_event_seq`);
-    }
-    const scheduledSeq = Number(task.scheduledEventSeq);
+export interface OrderResult {
+  orderId: string;
+  status: 'done';
+  shipped: unknown;
+}
 
-    const events = await getEvents(pool, task.workflowId);
-    const scheduled = events.find((e) => e.seq === scheduledSeq);
-    if (!scheduled || scheduled.event.type !== 'ActivityScheduled') {
-      throw new Error(`no ActivityScheduled event at seq ${scheduledSeq} for task ${task.id}`);
-    }
-    const activityType = scheduled.event.activityType as ActivityName;
+export const reserveChargeShip = defineWorkflow<OrderInput, OrderResult>(
+  'reserve-charge-ship',
+  async (input, ctx: WorkflowContext) => {
+    const reserved = await ctx.scheduleActivity('reserve', input);
+    const charged = await ctx.scheduleActivity('charge', reserved);
+    const shipped = await ctx.scheduleActivity('ship', charged);
+    return { orderId: input.orderId, status: 'done', shipped };
+  },
+);
 
-    // "Do the work" — fake/no-op, per the M2 plan; the real point is the
-    // event store plumbing around it, not this activity's own logic.
-    const result = { activityType, completedAt: new Date().toISOString() };
+/**
+ * A side channel purely for proving the M3 crash-recovery guarantee: the
+ * event log alone can't observably distinguish "this activity's function
+ * ran exactly once" from "replay is broken and it silently ran twice" —
+ * a duplicate `ActivityScheduled`/`ActivityCompleted` pair would still
+ * fold into a sensible-looking state. This table is incremented inside
+ * the activity function's own body, so it's a direct measure of real
+ * execution count, independent of the event log.
+ */
+export async function ensureActivityExecutionsTable(pool: Pool): Promise<void> {
+  await pool.query(
+    `CREATE TABLE IF NOT EXISTS activity_executions (
+       activity_type TEXT NOT NULL,
+       executed_at TIMESTAMPTZ NOT NULL DEFAULT now()
+     )`,
+  );
+}
 
-    const nextIndex = ACTIVITY_SEQUENCE.indexOf(activityType) + 1;
-    const nextActivity = ACTIVITY_SEQUENCE[nextIndex];
+export async function getActivityExecutionCount(pool: Pool, activityType: string): Promise<number> {
+  const { rows } = await pool.query<{ count: string }>(
+    'SELECT count(*) FROM activity_executions WHERE activity_type = $1',
+    [activityType],
+  );
+  return Number(rows[0]?.count ?? 0);
+}
 
-    await withTransaction(pool, (client) => {
-      if (nextActivity) {
-        return appendEvents(client, {
-          workflowId: task.workflowId,
-          events: [
-            { type: 'ActivityCompleted', scheduledEventSeq: scheduled.seq, result },
-            { type: 'ActivityScheduled', activityType: nextActivity, input: null },
-          ],
-        });
-      }
-      return appendEvents(client, {
-        workflowId: task.workflowId,
-        events: [
-          { type: 'ActivityCompleted', scheduledEventSeq: scheduled.seq, result },
-          { type: 'WorkflowCompleted', result: { status: 'done' } },
-        ],
-      });
-    });
-  };
+function trackedActivity<Input, Result>(
+  pool: Pool,
+  activityType: string,
+  run: (input: Input) => Promise<Result>,
+): ActivityDefinition<Input, Result> {
+  return defineActivity<Input, Result>(activityType, async (input) => {
+    await pool.query('INSERT INTO activity_executions (activity_type) VALUES ($1)', [activityType]);
+    return run(input);
+  });
+}
+
+/** Fake/no-op activities, per the M2/M3 plans — the point is the plumbing around them. */
+export function createReserveChargeShipActivities(pool: Pool): AnyActivityDefinition[] {
+  return [
+    trackedActivity(pool, 'reserve', async (input: OrderInput) => ({
+      reserved: true,
+      orderId: input.orderId,
+    })),
+    trackedActivity(pool, 'charge', async (input: unknown) => ({
+      charged: true,
+      of: input,
+    })),
+    trackedActivity(pool, 'ship', async (input: unknown) => ({
+      shipped: true,
+      of: input,
+    })),
+  ];
 }

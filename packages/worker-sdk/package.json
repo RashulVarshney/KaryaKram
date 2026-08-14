@@ -2,7 +2,7 @@
   "name": "@karyakram/worker-sdk",
   "version": "0.0.0",
   "private": true,
-  "description": "M1: worker run loop + reaper over the task queue. Full replay SDK arrives in M3.",
+  "description": "Worker run loop, reaper, and the deterministic replay engine's worker-side glue.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
@@ -10,7 +10,7 @@
     "worker": "dotenv -e ../../.env -- tsx src/bin/task-runner.ts",
     "reaper": "dotenv -e ../../.env -- tsx src/bin/run-reaper.ts",
     "demo": "dotenv -e ../../.env -- tsx src/bin/demo.ts",
-    "demo:m2": "dotenv -e ../../.env -- tsx src/bin/demo-m2.ts"
+    "demo:m3": "dotenv -e ../../.env -- tsx src/bin/demo-m3.ts"
   },
   "dependencies": {
     "@karyakram/core": "workspace:*",
