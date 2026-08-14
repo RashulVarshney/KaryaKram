@@ -1,6 +1,15 @@
-// packages/core is intentionally empty until M2 (event store + workflow
-// state machine). This placeholder exists so the package builds and the
-// ESLint no-IO rule (see eslint.config.js) has something to enforce
-// against from day one.
-
-export const CORE_PLACEHOLDER = true;
+export { initialState, applyEvent, foldEvents } from './workflow';
+export type {
+  WorkflowEventPayload,
+  WorkflowStartedEvent,
+  ActivityScheduledEvent,
+  ActivityCompletedEvent,
+  ActivityFailedEvent,
+  WorkflowCompletedEvent,
+  WorkflowFailedEvent,
+  StoredWorkflowEvent,
+  ActivityStatus,
+  ActivityState,
+  WorkflowStatus,
+  WorkflowState,
+} from './workflow';

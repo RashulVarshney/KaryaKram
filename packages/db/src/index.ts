@@ -14,3 +14,8 @@ export type {
   FailInput,
   ReclaimExpiredInput,
 } from './queue';
+
+export { withTransaction } from './transaction';
+
+export { appendEvents, getEvents } from './eventStore';
+export type { AppendEventsInput, AppendEventsResult } from './eventStore';

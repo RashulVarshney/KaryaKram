@@ -1,8 +1,11 @@
+import type { TaskType } from '@karyakram/db';
 import { generateWorkerId } from './workerId';
 
 export interface WorkerConfig {
   workerId: string;
   queue: string;
+  /** Undefined = dequeue any task type (M1's original, still-default behavior). */
+  taskType: TaskType | undefined;
   pollIntervalMs: number;
   maxPollIntervalMs: number;
   leaseSeconds: number;
@@ -14,6 +17,7 @@ export interface WorkerConfig {
 export interface WorkerConfigInput {
   workerId?: string;
   queue?: string;
+  taskType?: TaskType;
   pollIntervalMs?: number;
   maxPollIntervalMs?: number;
   leaseSeconds?: number;
@@ -59,6 +63,7 @@ export function resolveWorkerConfig(input: WorkerConfigInput): WorkerConfig {
   return {
     workerId: input.workerId ?? generateWorkerId(),
     queue: input.queue ?? 'default',
+    taskType: input.taskType,
     pollIntervalMs,
     maxPollIntervalMs,
     leaseSeconds,

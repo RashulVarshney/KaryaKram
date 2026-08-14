@@ -74,6 +74,13 @@ function isUniqueViolation(err: unknown, constraintName: string): boolean {
   return e.code === '23505' && e.constraint === constraintName;
 }
 
+// A PoolClient (not a bare Pool) has .release() — used to detect whether
+// `enqueue` might be running inside a caller-managed transaction that
+// spans more than this one statement.
+function isPoolClient(client: Queryable): client is PoolClient {
+  return typeof (client as Partial<PoolClient>).release === 'function';
+}
+
 export interface EnqueueInput {
   taskType: TaskType;
   workflowId: string;
@@ -89,6 +96,18 @@ export interface EnqueueInput {
  * `one_workflow_task_per_wf` rejects the insert — that's the correct
  * outcome (see docs/01-task-queue.md), so we swallow it and return null
  * rather than throwing.
+ *
+ * That swallow needs care when `client` is a `PoolClient` inside a
+ * caller-managed transaction (e.g. `appendEvents` in eventStore.ts):
+ * Postgres marks the *whole* transaction aborted after any error, even
+ * one the client catches — every later statement on that connection
+ * fails with `25P02` until an explicit ROLLBACK, unless the failing
+ * statement was wrapped in a SAVEPOINT. So when composing inside a
+ * transaction, the insert runs inside a savepoint that gets rolled back
+ * (not the whole transaction) on the expected conflict, leaving the rest
+ * of the caller's transaction usable. A bare `Pool` doesn't need this —
+ * each of its statements is already its own isolated implicit
+ * transaction, so a caught error there can't poison anything else.
  */
 export async function enqueue(client: Queryable, input: EnqueueInput): Promise<Task | null> {
   const {
@@ -100,6 +119,9 @@ export async function enqueue(client: Queryable, input: EnqueueInput): Promise<T
     maxAttempts = 3,
   } = input;
 
+  const useSavepoint = isPoolClient(client);
+  if (useSavepoint) await client.query('SAVEPOINT enqueue_attempt');
+
   try {
     const result = await client.query<TaskRow>(
       `INSERT INTO tasks (task_type, workflow_id, queue, scheduled_event_seq, status, run_after, max_attempts)
@@ -109,8 +131,10 @@ export async function enqueue(client: Queryable, input: EnqueueInput): Promise<T
     );
     const row = result.rows[0];
     if (!row) throw new Error('enqueue: INSERT ... RETURNING produced no row');
+    if (useSavepoint) await client.query('RELEASE SAVEPOINT enqueue_attempt');
     return mapRow(row);
   } catch (err) {
+    if (useSavepoint) await client.query('ROLLBACK TO SAVEPOINT enqueue_attempt');
     if (isUniqueViolation(err, 'one_workflow_task_per_wf')) {
       return null;
     }
@@ -121,6 +145,14 @@ export async function enqueue(client: Queryable, input: EnqueueInput): Promise<T
 export interface DequeueInput {
   workerId: string;
   queue?: string;
+  /**
+   * Filter to just this task type. M1 never needed this (its Worker only
+   * ran a dummy handler against whatever was in the queue), but M2 adds
+   * real `workflow`-type tasks that nothing consumes yet — a worker that
+   * doesn't filter would pick one up and fail it as if it were an
+   * activity. Omit to dequeue any type (M1's original behavior).
+   */
+  taskType?: TaskType;
   limit: number;
   leaseSeconds: number;
 }
@@ -132,12 +164,13 @@ export interface DequeueInput {
  * serialized throughput the way plain `FOR UPDATE` would.
  */
 export async function dequeue(client: Queryable, input: DequeueInput): Promise<Task[]> {
-  const { workerId, queue = 'default', limit, leaseSeconds } = input;
+  const { workerId, queue = 'default', taskType, limit, leaseSeconds } = input;
 
   const result = await client.query<TaskRow>(
     `WITH candidate AS (
        SELECT id FROM tasks
        WHERE status = 'pending' AND queue = $1 AND run_after <= now()
+         AND ($5::text IS NULL OR task_type = $5)
        ORDER BY run_after, id
        LIMIT $2
        FOR UPDATE SKIP LOCKED
@@ -150,7 +183,7 @@ export async function dequeue(client: Queryable, input: DequeueInput): Promise<T
        FROM candidate c
       WHERE t.id = c.id
      RETURNING t.*`,
-    [queue, limit, workerId, leaseSeconds],
+    [queue, limit, workerId, leaseSeconds, taskType ?? null],
   );
 
   return result.rows.map(mapRow);

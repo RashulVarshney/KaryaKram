@@ -72,6 +72,7 @@ export class Worker {
       tasks = await dequeue(this.pool, {
         workerId: this.config.workerId,
         queue: this.config.queue,
+        taskType: this.config.taskType,
         limit: capacity,
         leaseSeconds: this.config.leaseSeconds,
       });

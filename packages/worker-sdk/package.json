@@ -9,7 +9,8 @@
     "build": "tsc -b",
     "worker": "dotenv -e ../../.env -- tsx src/bin/task-runner.ts",
     "reaper": "dotenv -e ../../.env -- tsx src/bin/run-reaper.ts",
-    "demo": "dotenv -e ../../.env -- tsx src/bin/demo.ts"
+    "demo": "dotenv -e ../../.env -- tsx src/bin/demo.ts",
+    "demo:m2": "dotenv -e ../../.env -- tsx src/bin/demo-m2.ts"
   },
   "dependencies": {
     "@karyakram/core": "workspace:*",

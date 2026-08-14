@@ -87,7 +87,45 @@ The 50 reclaimed tasks are exact, not approximate: 2 killed workers ×
 25 in-flight tasks each (`maxConcurrency`) = exactly what each had leased
 and not yet completed at the moment of the kill.
 
+## M2 proof: workflow state derived purely from events
+
+`pnpm demo:m2` runs a 3-activity workflow (reserve → charge → ship) to
+completion through a real M1 `Worker`, then reconstructs its final state
+by folding `workflow_events` from `seq` 1 — the state was never read from
+anywhere else. Design reasoning (why the fold has to be pure, why
+`workflow_executions.status` is a cache and not a second source of truth,
+why append-and-enqueue is one transaction) is in
+[`docs/02-event-store.md`](./docs/02-event-store.md).
+
+```
+== KaryaKram M2 demo ==
+
+1. Resetting DB...
+2. Starting workflow (reserve -> charge -> ship)...
+   workflowId = 47bb7230-7a1e-46ae-a603-a1122701b6d5
+3. Running a worker until the workflow completes...
+
+4. Event log (workflow_events, seq order):
+   1. WorkflowStarted
+   2. ActivityScheduled (reserve)
+   3. ActivityCompleted
+   4. ActivityScheduled (charge)
+   5. ActivityCompleted
+   6. ActivityScheduled (ship)
+   7. ActivityCompleted
+   8. WorkflowCompleted
+
+5. State reconstructed purely by folding the log above:
+   status: COMPLETED
+   activity[2] reserve: COMPLETED
+   activity[4] charge: COMPLETED
+   activity[6] ship: COMPLETED
+
+PASS: workflow completed end to end, state derived purely from events.
+```
+
 ## Status
 
-M0 and M1 complete. See [`docs/plans/README.md`](./docs/plans/README.md)
-for the full milestone index.
+M0, M1, and M2 complete. See
+[`docs/plans/README.md`](./docs/plans/README.md) for the full milestone
+index.
