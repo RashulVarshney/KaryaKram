@@ -6,6 +6,8 @@ import { createPool } from '../src/pool';
 
 export interface TestDatabase {
   pool: Pool;
+  /** For spawning real child processes that need their own DATABASE_URL. */
+  connectionString: string;
   /** Truncates every user table between test cases so state never leaks across tests. */
   truncateAll: () => Promise<void>;
   stop: () => Promise<void>;
@@ -50,5 +52,5 @@ export async function startTestDatabase(): Promise<TestDatabase> {
     await container.stop();
   }
 
-  return { pool, truncateAll, stop };
+  return { pool, connectionString, truncateAll, stop };
 }

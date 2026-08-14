@@ -41,8 +41,53 @@ pnpm db:migrate
 pnpm test
 ```
 
+## M1 proof: a Postgres task queue with zero double-execution
+
+`pnpm demo:m1` seeds 10,000 tasks, spawns 8 real worker processes,
+`kill -9`'s two of them mid-run, and waits for the survivors to finish
+the job using nothing but lease expiry + a reaper — no coordinator, no
+external queue. Design reasoning (why `FOR UPDATE SKIP LOCKED`, why
+leases over delete-on-dequeue, the honest at-least-once boundary) is in
+[`docs/01-task-queue.md`](./docs/01-task-queue.md).
+
+```
+== KaryaKram M1 demo ==
+
+1. Resetting DB...
+2. Seeding 10000 tasks...
+3. Spawning 8 workers + 1 reaper...
+4. Killing 2 workers with SIGKILL mid-run...
+   killing worker-0 (pid 94879)
+   killing worker-1 (pid 94880)
+5. Waiting for the survivors to drain the queue...
+6. Shutting down survivors + reaper...
+
+== Summary ==
+Total tasks seeded:        10000
+Total results recorded:    10000
+Distinct tasks completed:  10000
+Duplicate result rows:     0 (must be 0 — a unique constraint on task_id would have thrown otherwise)
+Tasks reclaimed & retried: 50 (attempt > 1 — expected, from the 2 killed workers)
+
+Per-worker completions:
+  worker-2: 1661
+  worker-3: 1675
+  worker-4: 1657
+  worker-5: 1650
+  worker-6: 1675
+  worker-7: 1682
+
+Final task status breakdown:
+  completed: 10000
+
+PASS: 10000 tasks, zero double-execution, survived 2 killed workers.
+```
+
+The 50 reclaimed tasks are exact, not approximate: 2 killed workers ×
+25 in-flight tasks each (`maxConcurrency`) = exactly what each had leased
+and not yet completed at the moment of the kill.
+
 ## Status
 
-Currently on **M0 — Foundation**. See
-[`docs/plans/README.md`](./docs/plans/README.md) for the full milestone
-index.
+M0 and M1 complete. See [`docs/plans/README.md`](./docs/plans/README.md)
+for the full milestone index.

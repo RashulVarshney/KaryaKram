@@ -2,14 +2,23 @@
   "name": "@karyakram/worker-sdk",
   "version": "0.0.0",
   "private": true,
-  "description": "Worker runtime and workflow/activity authoring API. Empty until M3.",
+  "description": "M1: worker run loop + reaper over the task queue. Full replay SDK arrives in M3.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "build": "tsc -b"
+    "build": "tsc -b",
+    "worker": "dotenv -e ../../.env -- tsx src/bin/task-runner.ts",
+    "reaper": "dotenv -e ../../.env -- tsx src/bin/run-reaper.ts",
+    "demo": "dotenv -e ../../.env -- tsx src/bin/demo.ts"
   },
   "dependencies": {
     "@karyakram/core": "workspace:*",
-    "@karyakram/db": "workspace:*"
+    "@karyakram/db": "workspace:*",
+    "pg": "^8.23.0",
+    "pino": "^10.3.1"
+  },
+  "devDependencies": {
+    "@types/pg": "^8.21.0",
+    "dotenv-cli": "^11.0.0"
   }
 }
