@@ -1,0 +1,11 @@
+{
+  "name": "@karyakram/web",
+  "version": "0.0.0",
+  "private": true,
+  "description": "React control plane (DAG view, live SSE, time-travel debugger). Empty until M5 — real toolchain (Vite) gets set up then.",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc -b"
+  }
+}

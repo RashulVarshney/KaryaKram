@@ -1,0 +1,13 @@
+node_modules/
+dist/
+*.tsbuildinfo
+.env
+.env.local
+coverage/
+*.log
+.DS_Store
+
+# Personal planning/collaboration notes — not for the public repo.
+docs/plans/
+CLAUDE.md
+.claude/

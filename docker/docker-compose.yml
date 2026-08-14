@@ -1,0 +1,21 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: karyakram-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: karyakram
+      POSTGRES_PASSWORD: karyakram
+      POSTGRES_DB: karyakram
+    ports:
+      - '5432:5432'
+    volumes:
+      - karyakram_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U karyakram -d karyakram']
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  karyakram_pgdata:

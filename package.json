@@ -1,0 +1,33 @@
+{
+  "name": "karyakram",
+  "private": true,
+  "version": "0.0.0",
+  "description": "A from-scratch durable workflow execution engine (Temporal/Cadence-style core concepts).",
+  "packageManager": "pnpm@11.21.0",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "build": "tsc -b",
+    "test": "pnpm run test:unit && pnpm run test:integration",
+    "test:unit": "vitest run --project unit",
+    "test:integration": "vitest run --project integration",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "typecheck": "tsc -b --force",
+    "db:migrate": "pnpm --filter @karyakram/db run migrate:up",
+    "db:rollback": "pnpm --filter @karyakram/db run migrate:down"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@types/node": "^26.2.0",
+    "eslint": "^10.8.1",
+    "eslint-config-prettier": "^10.1.8",
+    "globals": "^17.11.0",
+    "prettier": "^3.9.6",
+    "tsx": "^4.23.12",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.67.0",
+    "vitest": "^4.1.10"
+  }
+}

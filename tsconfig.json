@@ -1,0 +1,11 @@
+{
+  "files": [],
+  "references": [
+    { "path": "packages/core" },
+    { "path": "packages/db" },
+    { "path": "packages/worker-sdk" },
+    { "path": "packages/scheduler" },
+    { "path": "packages/api" },
+    { "path": "packages/web" }
+  ]
+}

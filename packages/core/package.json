@@ -1,0 +1,11 @@
+{
+  "name": "@karyakram/core",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Pure workflow decision logic. No IO, no clock, no randomness — enforced by ESLint.",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc -b"
+  }
+}

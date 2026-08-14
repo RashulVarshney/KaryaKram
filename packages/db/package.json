@@ -1,0 +1,24 @@
+{
+  "name": "@karyakram/db",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Postgres pool, migrations, and all raw SQL. No ORM, no query builder.",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc -b",
+    "migrate:up": "dotenv -e ../../.env -- node-pg-migrate up -m migrations",
+    "migrate:down": "dotenv -e ../../.env -- node-pg-migrate down -m migrations"
+  },
+  "dependencies": {
+    "@karyakram/core": "workspace:*",
+    "pg": "^8.23.0"
+  },
+  "devDependencies": {
+    "@testcontainers/postgresql": "^12.1.0",
+    "@types/pg": "^8.21.0",
+    "dotenv-cli": "^11.0.0",
+    "node-pg-migrate": "^9.0.0",
+    "testcontainers": "^12.1.0"
+  }
+}

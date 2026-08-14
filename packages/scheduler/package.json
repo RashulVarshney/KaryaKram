@@ -1,0 +1,15 @@
+{
+  "name": "@karyakram/scheduler",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Multi-replica scheduler, leader election, reaper. Empty until M6 (reaper lives standalone in M1 first).",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc -b"
+  },
+  "dependencies": {
+    "@karyakram/core": "workspace:*",
+    "@karyakram/db": "workspace:*"
+  }
+}
