@@ -211,16 +211,15 @@ SSE rather than `LISTEN/NOTIFY`, why the DAG view is honest about only
 having ever rendered sequential chains) is in
 [`docs/05-control-plane.md`](./docs/05-control-plane.md).
 
-**Honestly scoped verification**: no browser automation tool was
-available while building this milestone. What was verified directly: the
-full stack was started for real and a workflow was driven through it via
-the actual HTTP API, producing the exact expected event history; the
-frontend build (`vite build`) and typecheck both pass; every React source
-file was fetched from the running Vite dev server and confirmed to
-transform and serve without error. What wasn't verified is the actual
-rendered DOM — the DAG's visual layout and the scrubber's drag behavior
-were not seen firsthand. See the design note's "Implementation notes" for
-the full account.
+**Found by actually opening it in a browser**: the first real load was a
+blank page — `@karyakram/core` compiles to CommonJS, and Vite doesn't
+run its usual CJS→ESM pre-bundling step for pnpm workspace symlinks (it
+assumes linked packages are source you're editing, not a dependency to
+bundle), so the browser choked trying to load the compiled `dist/index.js`
+as native ESM. Fixed with `optimizeDeps: { include: ['@karyakram/core'] }`
+in `vite.config.ts`. This is exactly the gap that build success, `tsc
+--noEmit`, and even a working `curl` round-trip through the API can't
+catch — see the design note's "Implementation notes" for the full account.
 
 ```
 $ curl -s http://localhost:3001/workflows | python3 -m json.tool

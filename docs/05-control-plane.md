@@ -84,19 +84,33 @@ still gets `@karyakram/core` as a real workspace dependency —
 `foldEvents` is imported into the browser bundle exactly like any other
 consumer, unmodified, which is the entire point (see above).
 
-**Honest limitation: no real browser was available to visually confirm
-rendering.** This environment has no browser automation/screenshot tool.
-What was actually verified: `vite build` succeeds; `tsc --noEmit` passes
-for the whole frontend; the full stack was started for real (Postgres,
-the reaper, a worker cluster, the API server, the Vite dev server) and a
-workflow was run through it end-to-end via the real HTTP API, producing
-the exact expected 8-event reserve→charge→ship history; every source
-file the UI depends on (`App.tsx`, `WorkflowDetail.tsx`, `DagView.tsx`,
-and `@xyflow/react`'s bundled dependency) was fetched from the running
-Vite dev server and confirmed to transform and serve without error. What
-was _not_ verified: that the DAG actually lays out visually correctly,
-that the scrubber's drag interaction behaves as intended, or that nothing
-throws a client-side React error only visible in an actual DOM/console.
-The code was written and reviewed carefully, and every layer beneath the
-final render was checked directly — but "the UI looks and behaves
-correctly" is a claim this note does not make, because it wasn't checked.
+**No browser automation tool was available while building this
+milestone**, so the layer below the actual rendered DOM was verified as
+thoroughly as possible without one — `vite build` succeeds, `tsc --noEmit`
+passes, the full stack was started for real and driven end-to-end via the
+live HTTP API, every source file was fetched from the running Vite dev
+server and confirmed to transform without error — but none of that
+proves the page actually renders. It didn't: the first real browser load
+was blank.
+
+**The bug, found by the user opening it in an actual browser**: `Uncaught
+SyntaxError: ... doesn't provide an export named: 'foldEvents'`.
+`@karyakram/core` compiles to CommonJS, matching every other Node
+consumer in this repo — but it's consumed here as a pnpm _workspace
+symlink_, not a real `node_modules` package. Vite's dependency
+pre-bundler normally converts CJS deps to ESM automatically, but it skips
+that step for linked workspace packages specifically, on the assumption
+that a linked package is source you're actively editing, not a
+dependency to bundle. So the browser was handed the compiled
+`dist/index.js` directly and asked to load it as native ESM — and Node's
+`exports.foldEvents = ...` doesn't look like a real `export` statement to
+a browser's module loader.
+
+Fixed with `optimizeDeps: { include: ['@karyakram/core'] }` in
+`vite.config.ts`, forcing the pre-bundler to process it like any other
+CJS dependency regardless of it being a symlink. Confirmed working after
+the fix: the page renders, the workflow list loads, and the time-travel
+scrubber visibly re-colors the DAG and updates the state panel while
+dragging. This is the concrete lesson behind the caveat above: build
+success, typecheck, and even a working HTTP round-trip through curl are
+real signal, but none of them are a substitute for loading the page.
