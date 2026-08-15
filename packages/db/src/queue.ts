@@ -109,6 +109,12 @@ export interface EnqueueInput {
  * of the caller's transaction usable. A bare `Pool` doesn't need this —
  * each of its statements is already its own isolated implicit
  * transaction, so a caught error there can't poison anything else.
+ *
+ * Also issues `pg_notify('tasks_available', queue)` in the same
+ * statement as the insert, so delivery is transactional — a listener
+ * only ever hears about a task after the transaction that created it has
+ * actually committed. Purely a latency shortcut for `Worker`'s poll loop
+ * (docs/06-scheduler.md); nothing depends on this notification arriving.
  */
 export async function enqueue(client: Queryable, input: EnqueueInput): Promise<Task | null> {
   const {
@@ -125,9 +131,14 @@ export async function enqueue(client: Queryable, input: EnqueueInput): Promise<T
 
   try {
     const result = await client.query<TaskRow>(
-      `INSERT INTO tasks (task_type, workflow_id, queue, scheduled_event_seq, status, run_after, max_attempts)
-       VALUES ($1, $2, $3, $4, 'pending', $5, $6)
-       RETURNING *`,
+      `WITH inserted AS (
+         INSERT INTO tasks (task_type, workflow_id, queue, scheduled_event_seq, status, run_after, max_attempts)
+         VALUES ($1, $2, $3, $4, 'pending', $5, $6)
+         RETURNING *
+       ), notified AS (
+         SELECT pg_notify('tasks_available', $3) FROM inserted
+       )
+       SELECT * FROM inserted`,
       [taskType, workflowId, queue, scheduledEventSeq, runAfter, maxAttempts],
     );
     const row = result.rows[0];

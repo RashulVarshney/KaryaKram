@@ -8,11 +8,14 @@ export interface ReaperConfig {
 }
 
 /**
- * Standalone loop that puts expired leases back to `pending`. Its own
- * process for M1. TODO(M6): move into the scheduler behind leader
- * election — running this from every replica concurrently (as multiple
- * standalone reaper processes would) is harmless but wasteful; it isn't
- * wrong because reclaimExpired is itself SKIP LOCKED-safe.
+ * Loop that puts expired leases back to `pending`. Its own standalone
+ * process for M1's demos (unchanged since — those are tagged proof
+ * artifacts). M6's `packages/scheduler` reuses this same class, started
+ * only on whichever replica currently holds leadership, so it no longer
+ * runs redundantly from every replica in the new demo. Running it from
+ * more than one place concurrently was always harmless, just wasteful —
+ * `reclaimExpired` is itself SKIP LOCKED-safe — so M1's standalone usage
+ * remains correct. See docs/06-scheduler.md.
  */
 export class Reaper {
   private readonly intervalMs: number;

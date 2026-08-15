@@ -12,6 +12,7 @@ export interface WorkerConfig {
   heartbeatIntervalMs: number;
   maxConcurrency: number;
   drainTimeoutMs: number;
+  notifyConnectionString: string | undefined;
 }
 
 export interface WorkerConfigInput {
@@ -24,6 +25,14 @@ export interface WorkerConfigInput {
   heartbeatIntervalMs?: number;
   maxConcurrency: number;
   drainTimeoutMs?: number;
+  /**
+   * Opt-in `LISTEN/NOTIFY` wake-up: when set, the worker opens one extra
+   * dedicated connection and wakes immediately on `tasks_available`
+   * instead of waiting out its poll backoff. Polling continues
+   * unchanged either way — this only ever shortens the wait, never
+   * replaces it. See docs/06-scheduler.md.
+   */
+  notifyConnectionString?: string;
 }
 
 /**
@@ -70,5 +79,6 @@ export function resolveWorkerConfig(input: WorkerConfigInput): WorkerConfig {
     heartbeatIntervalMs,
     maxConcurrency: input.maxConcurrency,
     drainTimeoutMs: input.drainTimeoutMs ?? 30_000,
+    notifyConnectionString: input.notifyConnectionString,
   };
 }

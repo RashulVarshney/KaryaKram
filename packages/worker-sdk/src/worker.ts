@@ -1,6 +1,6 @@
-import type { Pool } from 'pg';
+import { Client, type Pool } from 'pg';
 import pino, { type Logger } from 'pino';
-import { complete, dequeue, fail, heartbeat, type Task } from '@karyakram/db';
+import { complete, dequeue, fail, heartbeat, listenForTasks, type Task } from '@karyakram/db';
 import { PollBackoff } from './backoff';
 import { resolveWorkerConfig, type WorkerConfig, type WorkerConfigInput } from './config';
 
@@ -20,6 +20,7 @@ export class Worker {
   private stopped = false;
   private pollTimer: NodeJS.Timeout | null = null;
   private heartbeatTimer: NodeJS.Timeout | null = null;
+  private notifyClient: Client | null = null;
 
   constructor(
     private readonly pool: Pool,
@@ -46,6 +47,33 @@ export class Worker {
     this.heartbeatTimer = setInterval(() => {
       void this.sendHeartbeats();
     }, this.config.heartbeatIntervalMs);
+    if (this.config.notifyConnectionString)
+      void this.startListening(this.config.notifyConnectionString);
+  }
+
+  /**
+   * Best-effort wake-up: on `tasks_available`, reset backoff and poll
+   * immediately instead of waiting out whatever delay it eased up to.
+   * If this connection never comes up, or drops later, the worker just
+   * keeps working via polling alone — never a reason to stop.
+   */
+  private async startListening(connectionString: string): Promise<void> {
+    const client = new Client({ connectionString });
+    client.on('error', (err) => {
+      this.logger.warn({ err }, 'notify connection error — falling back to polling only');
+    });
+    try {
+      await client.connect();
+      await listenForTasks(client, 'tasks_available', () => {
+        this.backoff.onWork();
+        if (this.pollTimer) clearTimeout(this.pollTimer);
+        this.scheduleNextPoll(0);
+      });
+      this.notifyClient = client;
+      this.logger.info('listening for tasks_available notifications');
+    } catch (err) {
+      this.logger.warn({ err }, 'failed to establish notify connection — polling only');
+    }
   }
 
   private scheduleNextPoll(delayMs: number): void {
@@ -164,6 +192,13 @@ export class Worker {
     this.stopped = true;
     if (this.pollTimer) clearTimeout(this.pollTimer);
     if (this.heartbeatTimer) clearInterval(this.heartbeatTimer);
+    if (this.notifyClient) {
+      const client = this.notifyClient;
+      this.notifyClient = null;
+      await client.end().catch(() => {
+        // already closing/closed
+      });
+    }
 
     const inFlight = [...this.running.values()];
     if (inFlight.length > 0) {

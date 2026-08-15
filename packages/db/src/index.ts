@@ -1,4 +1,4 @@
-export { createPool, createPoolFromEnv } from './pool';
+export { createPool, createPoolFromEnv, createClientFromEnv } from './pool';
 export type { PoolConfig } from './pool';
 
 export { enqueue, dequeue, heartbeat, complete, fail, reclaimExpired } from './queue';
@@ -28,3 +28,14 @@ export type { RetryDelayOptions } from './backoff';
 
 export { listDeadTasks, requeueDeadTask } from './dlq';
 export type { DeadTask, ListDeadTasksInput, RequeueDeadTaskInput } from './dlq';
+
+export { listenForTasks } from './notify';
+
+export {
+  LEADER_LOCK_KEY,
+  tryAcquireLeaderLock,
+  releaseLeaderLock,
+  recordLeadership,
+  getCurrentLeader,
+} from './leadership';
+export type { CurrentLeader } from './leadership';

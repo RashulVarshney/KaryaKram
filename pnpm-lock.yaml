@@ -107,6 +107,22 @@ importers:
       '@karyakram/db':
         specifier: workspace:*
         version: link:../db
+      '@karyakram/worker-sdk':
+        specifier: workspace:*
+        version: link:../worker-sdk
+      pg:
+        specifier: ^8.23.0
+        version: 8.23.0
+      pino:
+        specifier: ^10.3.1
+        version: 10.3.1
+    devDependencies:
+      '@types/pg':
+        specifier: ^8.21.0
+        version: 8.21.0
+      dotenv-cli:
+        specifier: ^11.0.0
+        version: 11.0.0
 
   packages/web:
     dependencies:

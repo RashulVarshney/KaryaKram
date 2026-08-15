@@ -236,8 +236,53 @@ $ curl -s http://localhost:3001/workflows | python3 -m json.tool
 }
 ```
 
+## M6 proof: leader failover in under a poll interval
+
+Three `packages/scheduler` replicas race for a single Postgres advisory
+lock; whichever holds it is leader and runs the reaper (moved here from
+its own standalone M1 process, now leader-gated instead of running
+redundantly on every replica). `pnpm demo:m6` starts all three, confirms
+exactly one is leader, seeds a task with an already-expired lease to
+prove that replica's reaper is actually working, `kill -9`'s it, and
+proves a survivor takes over — and resumes reaping — well inside the
+5-second exit-criteria bound. `enqueue()` also now fires
+`pg_notify('tasks_available', ...)` so an idle `Worker` can wake up
+immediately instead of waiting out its poll backoff; polling remains the
+permanent backstop either way. Design reasoning (why a session-scoped
+advisory lock instead of a lease table, why the reaper isn't retrofitted
+into M1–M4's own tagged demos, why `LISTEN/NOTIFY` is a shortcut layered
+on polling and not a replacement for it, and why batched-dequeue tuning
+and the fat-worker→gRPC extraction were explicitly descoped from this
+milestone rather than half-built to satisfy an early stub) is in
+[`docs/06-scheduler.md`](./docs/06-scheduler.md).
+
+```
+== KaryaKram M6 demo ==
+
+1. Resetting DB...
+2. Starting three scheduler replicas...
+3. Waiting for exactly one to acquire leadership...
+   leader = cluster-2 (1 replica claimed leadership so far)
+4. Seeding a task with an already-expired lease...
+   reclaimed by the leader's reaper: true
+5. Killing the leader (cluster-2) with SIGKILL...
+6. Waiting for a survivor to become the new leader (must be under 5s)...
+   new leader = cluster-1, failover took 223ms
+7. Seeding a second expired-lease task to prove the new leader is reaping...
+   reclaimed by the new leader's reaper: true
+
+PASS: leader failover in 223ms, reaping worked before and after, no duplicate reclaims (guaranteed by SKIP LOCKED regardless of which replica raced for it).
+```
+
+Run 6 times back to back to check for flakiness before writing this up:
+failover measured at 32ms, 142ms, 165ms, 167ms, 193ms, and 223ms — stable
+every time, and consistent with the design note's reasoning that failover
+should cost roughly one `electionPollMs` (200ms in the demo) plus
+negligible overhead, since `kill -9` closes the TCP connection
+immediately and Postgres releases the advisory lock right away.
+
 ## Status
 
-M0 through M5 complete. See
+M0 through M6 complete. See
 [`docs/plans/README.md`](./docs/plans/README.md) for the full milestone
 index.
