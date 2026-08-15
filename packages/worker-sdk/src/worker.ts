@@ -1,10 +1,17 @@
 import { Client, type Pool } from 'pg';
 import pino, { type Logger } from 'pino';
+import type { Tracer } from '@opentelemetry/api';
 import { complete, dequeue, fail, heartbeat, listenForTasks, type Task } from '@karyakram/db';
+import { extractTraceContext, withSpan, type TaskMetrics } from '@karyakram/observability';
 import { PollBackoff } from './backoff';
 import { resolveWorkerConfig, type WorkerConfig, type WorkerConfigInput } from './config';
 
 export type TaskHandler = (task: Task) => Promise<void>;
+
+export interface WorkerObservability {
+  tracer: Tracer;
+  metrics: TaskMetrics;
+}
 
 /**
  * A single worker process's run loop: poll for work with backpressure,
@@ -27,6 +34,8 @@ export class Worker {
     config: WorkerConfigInput,
     private readonly handler: TaskHandler,
     logger: Logger = pino({ level: process.env['LOG_LEVEL'] ?? 'info' }),
+    /** Opt-in — omit for no tracing/metrics, exactly like `notifyConnectionString`. See docs/07-observability.md. */
+    private readonly observability?: WorkerObservability,
   ) {
     this.config = resolveWorkerConfig(config);
     this.logger = logger.child({ workerId: this.config.workerId });
@@ -113,6 +122,14 @@ export class Worker {
     } else {
       this.backoff.onWork();
       for (const task of tasks) {
+        if (this.observability) {
+          const { tasksDequeuedTotal, taskWaitSeconds } = this.observability.metrics;
+          tasksDequeuedTotal.inc({ task_type: task.taskType });
+          taskWaitSeconds.observe(
+            { task_type: task.taskType },
+            (Date.now() - task.createdAt.getTime()) / 1000,
+          );
+        }
         this.dispatch(task);
       }
     }
@@ -122,15 +139,26 @@ export class Worker {
 
   private dispatch(task: Task): void {
     const log = this.logger.child({ taskId: task.id });
+    const runHandler = async (): Promise<void> => {
+      if (!this.observability) {
+        await this.handler(task);
+        return;
+      }
+      const { tracer } = this.observability;
+      const parentContext = extractTraceContext(task.traceContext);
+      await withSpan(tracer, `execute ${task.taskType}`, parentContext, () => this.handler(task));
+    };
+
     const run = (async () => {
       try {
-        await this.handler(task);
+        await runHandler();
         const applied = await complete(this.pool, {
           taskId: task.id,
           workerId: this.config.workerId,
         });
         if (applied) {
           log.info('task completed');
+          this.observability?.metrics.tasksCompletedTotal.inc({ task_type: task.taskType });
         } else {
           log.warn('complete() did not apply — lease was lost before completion');
         }
@@ -144,6 +172,7 @@ export class Worker {
         });
         if (applied) {
           log.warn({ err }, 'task failed');
+          this.observability?.metrics.tasksFailedTotal.inc({ task_type: task.taskType });
         } else {
           log.warn({ err }, 'fail() did not apply — lease was lost before failure was recorded');
         }

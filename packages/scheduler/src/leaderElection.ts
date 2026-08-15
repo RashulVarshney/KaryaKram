@@ -89,7 +89,6 @@ export class LeaderElection {
     if (this.stopped) return;
 
     if (acquired) {
-      this.leader = true;
       this.logger.info('acquired leadership');
       try {
         await recordLeadership(this.client, this.config.leaderId);
@@ -99,6 +98,13 @@ export class LeaderElection {
         // here doesn't affect who's actually leader.
         this.logger.warn({ err }, 'failed to record leadership row (lock still held)');
       }
+      if (this.stopped) return;
+      // Flipped only after the observability write is attempted, so any
+      // caller that sees `isLeader` become true can trust
+      // `scheduler_leadership` already reflects it (or at least that
+      // writing it was already tried) — without this ordering there's a
+      // real window where the lock is held but the row isn't there yet.
+      this.leader = true;
       this.onAcquire();
       // No further polling needed while the lock is held — this
       // connection keeps it until it closes or is explicitly released.

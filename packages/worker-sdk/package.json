@@ -16,11 +16,14 @@
   "dependencies": {
     "@karyakram/core": "workspace:*",
     "@karyakram/db": "workspace:*",
+    "@karyakram/observability": "workspace:*",
+    "@opentelemetry/api": "^1.9.1",
     "pg": "^8.23.0",
     "pino": "^10.3.1"
   },
   "devDependencies": {
     "@types/pg": "^8.21.0",
-    "dotenv-cli": "^11.0.0"
+    "dotenv-cli": "^11.0.0",
+    "prom-client": "^15.1.3"
   }
 }

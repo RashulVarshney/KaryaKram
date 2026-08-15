@@ -1,7 +1,15 @@
 export { createPool, createPoolFromEnv, createClientFromEnv } from './pool';
 export type { PoolConfig } from './pool';
 
-export { enqueue, dequeue, heartbeat, complete, fail, reclaimExpired } from './queue';
+export {
+  enqueue,
+  dequeue,
+  heartbeat,
+  complete,
+  fail,
+  reclaimExpired,
+  getQueueDepth,
+} from './queue';
 export type {
   Queryable,
   Task,

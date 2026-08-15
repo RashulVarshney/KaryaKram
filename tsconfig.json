@@ -3,8 +3,10 @@
   "references": [
     { "path": "packages/core" },
     { "path": "packages/db" },
+    { "path": "packages/observability" },
     { "path": "packages/worker-sdk" },
     { "path": "packages/scheduler" },
-    { "path": "packages/api" }
+    { "path": "packages/api" },
+    { "path": "bench" }
   ]
 }

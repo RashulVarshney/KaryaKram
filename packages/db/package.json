@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@karyakram/core": "workspace:*",
+    "@karyakram/observability": "workspace:*",
     "pg": "^8.23.0"
   },
   "devDependencies": {

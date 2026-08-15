@@ -5,9 +5,14 @@
  * real OS processes of this and `kill -9` them for the crash-recovery
  * proof — the whole point is that killing this process and starting a
  * fresh one must not re-run a completed activity.
+ *
+ * Tracing/metrics (M7) are opt-in via env vars and change nothing about
+ * default behavior when unset — every earlier milestone's demo that
+ * spawns this process is unaffected. See docs/07-observability.md.
  */
 import { createPoolFromEnv } from '@karyakram/db';
-import { Worker } from '../worker';
+import { createTaskMetrics, MetricsServer, startTracing } from '@karyakram/observability';
+import { Worker, type WorkerObservability } from '../worker';
 import { createActivityHandler } from '../activityHandler';
 import { createWorkflowReplayHandler } from '../workflowReplayHandler';
 import {
@@ -32,6 +37,16 @@ async function main(): Promise<void> {
   const leaseSeconds = envInt('LEASE_SECONDS', 10);
   const heartbeatIntervalMs = envInt('HEARTBEAT_INTERVAL_MS', 2_000);
   const pollIntervalMs = envInt('POLL_INTERVAL_MS', 50);
+  const notifyConnectionString = process.env['NOTIFY_CONNECTION_STRING'];
+
+  const tracing = process.env['OTEL_EXPORTER_OTLP_ENDPOINT']
+    ? startTracing(`worker-${workerIdPrefix}`)
+    : undefined;
+  const metricsServer = process.env['METRICS_PORT'] ? new MetricsServer() : undefined;
+  const metrics = metricsServer ? createTaskMetrics(metricsServer.registry) : undefined;
+  if (metricsServer) metricsServer.start(Number(process.env['METRICS_PORT']));
+  const observability: WorkerObservability | undefined =
+    tracing && metrics ? { tracer: tracing.tracer, metrics } : undefined;
 
   const activityWorker = new Worker(
     pool,
@@ -42,8 +57,11 @@ async function main(): Promise<void> {
       leaseSeconds,
       heartbeatIntervalMs,
       pollIntervalMs,
+      notifyConnectionString,
     },
     createActivityHandler(pool, createReserveChargeShipActivities(pool)),
+    undefined,
+    observability,
   );
 
   const workflowWorker = new Worker(
@@ -55,8 +73,11 @@ async function main(): Promise<void> {
       leaseSeconds,
       heartbeatIntervalMs,
       pollIntervalMs,
+      notifyConnectionString,
     },
     createWorkflowReplayHandler(pool, [reserveChargeShip]),
+    undefined,
+    observability,
   );
 
   activityWorker.start();
@@ -67,7 +88,7 @@ async function main(): Promise<void> {
     if (shuttingDown) return;
     shuttingDown = true;
     void Promise.all([activityWorker.stop(), workflowWorker.stop()])
-      .then(() => pool.end())
+      .then(() => Promise.all([pool.end(), metricsServer?.stop(), tracing?.shutdown()]))
       .finally(() => process.exit(0));
   };
   process.on('SIGTERM', shutdown);

@@ -1,6 +1,7 @@
 import type { Pool } from 'pg';
 import pino, { type Logger } from 'pino';
 import { reclaimExpired } from '@karyakram/db';
+import type { TaskMetrics } from '@karyakram/observability';
 
 export interface ReaperConfig {
   intervalMs?: number;
@@ -28,6 +29,8 @@ export class Reaper {
     private readonly pool: Pool,
     config: ReaperConfig = {},
     logger: Logger = pino({ level: process.env['LOG_LEVEL'] ?? 'info' }),
+    /** Opt-in, exactly like `Worker`'s observability param. See docs/07-observability.md. */
+    private readonly metrics?: TaskMetrics,
   ) {
     this.intervalMs = config.intervalMs ?? 5_000;
     this.limit = config.limit ?? 100;
@@ -54,6 +57,7 @@ export class Reaper {
           { count: reclaimed.length, taskIds: reclaimed },
           'reclaimed expired leases',
         );
+        this.metrics?.tasksReclaimedTotal.inc(reclaimed.length);
       }
     } catch (err) {
       this.logger.error({ err }, 'reclaimExpired failed');

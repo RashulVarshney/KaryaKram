@@ -1,0 +1,17 @@
+{
+  "name": "@karyakram/bench",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Measured before/after numbers for M6's LISTEN/NOTIFY change — plain TypeScript, not k6. See docs/07-observability.md.",
+  "scripts": {
+    "build": "tsc -b",
+    "bench": "dotenv -e ../.env -- tsx src/queueThroughput.ts"
+  },
+  "dependencies": {
+    "@karyakram/db": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/pg": "^8.21.0",
+    "dotenv-cli": "^11.0.0"
+  }
+}

@@ -5,5 +5,10 @@
     "rootDir": "src"
   },
   "include": ["src"],
-  "references": [{ "path": "../core" }, { "path": "../db" }, { "path": "../worker-sdk" }]
+  "references": [
+    { "path": "../core" },
+    { "path": "../db" },
+    { "path": "../observability" },
+    { "path": "../worker-sdk" }
+  ]
 }

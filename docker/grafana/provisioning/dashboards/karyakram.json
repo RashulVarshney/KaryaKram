@@ -1,0 +1,74 @@
+{
+  "title": "KaryaKram — task queue",
+  "uid": "karyakram-queue",
+  "timezone": "browser",
+  "refresh": "5s",
+  "time": { "from": "now-15m", "to": "now" },
+  "schemaVersion": 39,
+  "panels": [
+    {
+      "id": 1,
+      "title": "Queue depth by status",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 },
+      "targets": [
+        {
+          "expr": "karyakram_queue_depth",
+          "legendFormat": "{{status}}",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "title": "Task outcome rate (5m)",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 },
+      "targets": [
+        {
+          "expr": "sum(rate(karyakram_tasks_dequeued_total[5m])) by (task_type)",
+          "legendFormat": "dequeued {{task_type}}",
+          "refId": "A"
+        },
+        {
+          "expr": "sum(rate(karyakram_tasks_completed_total[5m])) by (task_type)",
+          "legendFormat": "completed {{task_type}}",
+          "refId": "B"
+        },
+        {
+          "expr": "sum(rate(karyakram_tasks_failed_total[5m])) by (task_type)",
+          "legendFormat": "failed {{task_type}}",
+          "refId": "C"
+        },
+        {
+          "expr": "sum(rate(karyakram_tasks_reclaimed_total[5m]))",
+          "legendFormat": "reclaimed",
+          "refId": "D"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "title": "Task wait time (p50 / p95 / p99)",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 8 },
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.50, sum(rate(karyakram_task_wait_seconds_bucket[5m])) by (le))",
+          "legendFormat": "p50",
+          "refId": "A"
+        },
+        {
+          "expr": "histogram_quantile(0.95, sum(rate(karyakram_task_wait_seconds_bucket[5m])) by (le))",
+          "legendFormat": "p95",
+          "refId": "B"
+        },
+        {
+          "expr": "histogram_quantile(0.99, sum(rate(karyakram_task_wait_seconds_bucket[5m])) by (le))",
+          "legendFormat": "p99",
+          "refId": "C"
+        }
+      ]
+    }
+  ]
+}

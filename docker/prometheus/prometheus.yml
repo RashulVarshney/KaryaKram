@@ -1,0 +1,14 @@
+global:
+  scrape_interval: 5s
+
+scrape_configs:
+  - job_name: karyakram
+    static_configs:
+      # `pnpm demo:m7` fixes each process's METRICS_PORT to these values.
+      # The app process runs both an activity and a workflow Worker but
+      # shares one MetricsServer/registry between them (task_type labels
+      # tell their counters apart), so it's one target, not two. See
+      # docs/07-observability.md and packages/scheduler/src/bin/demo-m7.ts.
+      - targets:
+          - host.docker.internal:9101 # scheduler
+          - host.docker.internal:9102 # reserve-charge-ship app (activity + workflow workers)

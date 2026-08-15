@@ -1,0 +1,20 @@
+{
+  "name": "@karyakram/observability",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Shared OTel tracing + Prometheus metrics setup, used by every process instead of five copies of SDK boilerplate.",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc -b"
+  },
+  "dependencies": {
+    "@opentelemetry/api": "^1.9.1",
+    "@opentelemetry/exporter-trace-otlp-http": "^0.221.0",
+    "@opentelemetry/resources": "^2.10.0",
+    "@opentelemetry/sdk-trace-base": "^2.10.0",
+    "@opentelemetry/sdk-trace-node": "^2.10.0",
+    "@opentelemetry/semantic-conventions": "^1.43.0",
+    "prom-client": "^15.1.3"
+  }
+}

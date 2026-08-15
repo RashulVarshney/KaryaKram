@@ -8,11 +8,13 @@
   "scripts": {
     "build": "tsc -b",
     "scheduler": "dotenv -e ../../.env -- tsx src/bin/run-scheduler.ts",
-    "demo:m6": "dotenv -e ../../.env -- tsx src/bin/demo-m6.ts"
+    "demo:m6": "dotenv -e ../../.env -- tsx src/bin/demo-m6.ts",
+    "demo:m7": "dotenv -e ../../.env -- tsx src/bin/demo-m7.ts"
   },
   "dependencies": {
     "@karyakram/core": "workspace:*",
     "@karyakram/db": "workspace:*",
+    "@karyakram/observability": "workspace:*",
     "@karyakram/worker-sdk": "workspace:*",
     "pg": "^8.23.0",
     "pino": "^10.3.1"

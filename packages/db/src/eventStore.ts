@@ -5,6 +5,7 @@ import {
   type WorkflowEventPayload,
   type WorkflowState,
 } from '@karyakram/core';
+import { injectTraceContext } from '@karyakram/observability';
 import { enqueue, type Queryable } from './queue';
 
 export interface AppendEventsInput {
@@ -72,12 +73,21 @@ export async function appendEvents(
     );
   }
 
+  // Whatever span is active when appendEvents runs (typically the one
+  // Worker.dispatch opened around the handler that decided to schedule
+  // this) gets threaded onto every task this call enqueues, so a later
+  // dequeue()/execute() in a different process can resume the same
+  // trace instead of starting a disconnected one — the actual
+  // "append -> enqueue -> lease -> execute" link. See docs/07-observability.md.
+  const traceContext = injectTraceContext();
+
   for (const stored of storedEvents) {
     if (stored.event.type === 'ActivityScheduled') {
       await enqueue(client, {
         taskType: 'activity',
         workflowId,
         scheduledEventSeq: stored.seq,
+        traceContext,
       });
     } else if (stored.event.type === 'TimerScheduled') {
       // A durable timer is just a task whose run_after is in the future
@@ -88,6 +98,7 @@ export async function appendEvents(
         workflowId,
         scheduledEventSeq: stored.seq,
         runAfter: new Date(stored.event.fireAt),
+        traceContext,
       });
     }
   }
@@ -95,7 +106,7 @@ export async function appendEvents(
   // Signals the replay worker that there's new history to look at —
   // no-op (returns null) if a workflow task is already pending/leased,
   // per M1's one-workflow-task-at-a-time invariant.
-  await enqueue(client, { taskType: 'workflow', workflowId });
+  await enqueue(client, { taskType: 'workflow', workflowId, traceContext });
 
   const allEvents = await getEvents(client, workflowId);
   const state = foldEvents(allEvents);

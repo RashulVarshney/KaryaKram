@@ -25,6 +25,8 @@ export interface Task {
   leasedBy: string | null;
   leaseExpiresAt: Date | null;
   createdAt: Date;
+  /** The enqueuer's W3C `traceparent`, if it ran inside an active span. See docs/07-observability.md. */
+  traceContext: string | null;
 }
 
 interface TaskRow {
@@ -41,6 +43,7 @@ interface TaskRow {
   leased_by: string | null;
   lease_expires_at: Date | null;
   created_at: Date;
+  trace_context: string | null;
 }
 
 function mapRow(row: TaskRow): Task {
@@ -58,6 +61,7 @@ function mapRow(row: TaskRow): Task {
     leasedBy: row.leased_by,
     leaseExpiresAt: row.lease_expires_at,
     createdAt: row.created_at,
+    traceContext: row.trace_context,
   };
 }
 
@@ -89,6 +93,8 @@ export interface EnqueueInput {
   scheduledEventSeq?: string | number | null;
   runAfter?: Date;
   maxAttempts?: number;
+  /** Serialized `traceparent` of the enqueuer's active span, if any. See docs/07-observability.md. */
+  traceContext?: string | null;
 }
 
 /**
@@ -110,11 +116,23 @@ export interface EnqueueInput {
  * each of its statements is already its own isolated implicit
  * transaction, so a caught error there can't poison anything else.
  *
- * Also issues `pg_notify('tasks_available', queue)` in the same
- * statement as the insert, so delivery is transactional — a listener
- * only ever hears about a task after the transaction that created it has
- * actually committed. Purely a latency shortcut for `Worker`'s poll loop
- * (docs/06-scheduler.md); nothing depends on this notification arriving.
+ * Also issues `pg_notify('tasks_available', queue)` on the same
+ * client/session right after the insert, so delivery is transactional —
+ * a listener only ever hears about a task after the transaction that
+ * created it has actually committed. Purely a latency shortcut for
+ * `Worker`'s poll loop (docs/06-scheduler.md); nothing depends on this
+ * notification arriving.
+ *
+ * The `pg_notify` call is a separate statement, not folded into the
+ * insert's `WITH` clause. It was originally written as an unreferenced
+ * plain-`SELECT` CTE (`WITH inserted AS (INSERT ...), notified AS
+ * (SELECT pg_notify(...) FROM inserted) SELECT * FROM inserted`) — that
+ * silently never notified anyone: Postgres only *guarantees* execution
+ * for data-modifying CTEs (`INSERT`/`UPDATE`/`DELETE`), not a plain
+ * `SELECT` CTE whose output nothing reads, even one calling a volatile
+ * function. Confirmed empirically (a separate `LISTEN`ing connection
+ * never received a single notification across 5 enqueues under the old
+ * form) before switching to this shape.
  */
 export async function enqueue(client: Queryable, input: EnqueueInput): Promise<Task | null> {
   const {
@@ -124,6 +142,7 @@ export async function enqueue(client: Queryable, input: EnqueueInput): Promise<T
     scheduledEventSeq = null,
     runAfter = new Date(),
     maxAttempts = 3,
+    traceContext = null,
   } = input;
 
   const useSavepoint = isPoolClient(client);
@@ -131,18 +150,14 @@ export async function enqueue(client: Queryable, input: EnqueueInput): Promise<T
 
   try {
     const result = await client.query<TaskRow>(
-      `WITH inserted AS (
-         INSERT INTO tasks (task_type, workflow_id, queue, scheduled_event_seq, status, run_after, max_attempts)
-         VALUES ($1, $2, $3, $4, 'pending', $5, $6)
-         RETURNING *
-       ), notified AS (
-         SELECT pg_notify('tasks_available', $3) FROM inserted
-       )
-       SELECT * FROM inserted`,
-      [taskType, workflowId, queue, scheduledEventSeq, runAfter, maxAttempts],
+      `INSERT INTO tasks (task_type, workflow_id, queue, scheduled_event_seq, status, run_after, max_attempts, trace_context)
+       VALUES ($1, $2, $3, $4, 'pending', $5, $6, $7)
+       RETURNING *`,
+      [taskType, workflowId, queue, scheduledEventSeq, runAfter, maxAttempts, traceContext],
     );
     const row = result.rows[0];
     if (!row) throw new Error('enqueue: INSERT ... RETURNING produced no row');
+    await client.query('SELECT pg_notify($1, $2)', ['tasks_available', queue]);
     if (useSavepoint) await client.query('RELEASE SAVEPOINT enqueue_attempt');
     return mapRow(row);
   } catch (err) {
@@ -324,4 +339,21 @@ export async function reclaimExpired(
   );
 
   return result.rows.map((r) => r.id);
+}
+
+/**
+ * Current task count by status, for the `karyakram_queue_depth` gauge.
+ * Global state, not per-worker — published only by whichever replica
+ * currently holds leadership (see `packages/scheduler`), the same
+ * single-writer reasoning as the reaper. See docs/07-observability.md.
+ */
+export async function getQueueDepth(client: Queryable): Promise<Record<TaskStatus, number>> {
+  const result = await client.query<{ status: TaskStatus; count: string }>(
+    'SELECT status, COUNT(*) AS count FROM tasks GROUP BY status',
+  );
+  const depth: Record<TaskStatus, number> = { pending: 0, leased: 0, completed: 0, dead: 0 };
+  for (const row of result.rows) {
+    depth[row.status] = Number(row.count);
+  }
+  return depth;
 }

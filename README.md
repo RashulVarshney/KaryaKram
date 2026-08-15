@@ -281,8 +281,57 @@ should cost roughly one `electionPollMs` (200ms in the demo) plus
 negligible overhead, since `kill -9` closes the TCP connection
 immediately and Postgres releases the advisory lock right away.
 
+**Correction, found while building M7**: the `pg_notify` call described
+above never actually fired — it was dead code from the moment it was
+written, buried in a `SELECT` CTE that Postgres's planner was free to
+skip since nothing referenced it. M6's own exit criteria never exercised
+it, so it went unnoticed until M7's bench harness measured "no
+difference between polling and notify" and that was the tell. Fixed in
+M7; see below for the real numbers.
+
+## M7 proof: real numbers, and a real bug they caught
+
+The first milestone allowed to make a measured performance claim —
+everything before this was labeled `TARGET (unmeasured)`. OpenTelemetry
+traces now follow a task across process boundaries (`tasks.trace_context`
+carries a `traceparent` string through Postgres itself, from whichever
+process called `appendEvents` to whichever process later dequeues and
+executes the task), Prometheus/Grafana show live queue depth and task
+rates, and a hand-rolled bench harness (not k6 — see the design note)
+measures `LISTEN/NOTIFY` against plain polling head-to-head.
+
+**Building that bench harness caught a real bug**: the very first
+measurement came back showing no difference between polling and notify
+at all, which shouldn't have been possible — and wasn't. `enqueue()`'s
+`pg_notify` call had been silently dead since M6 wrote it. Root cause,
+fix, and a minimal repro proving both are in
+[`docs/07-observability.md`](./docs/07-observability.md)'s
+"Implementation notes".
+
+```
+$ pnpm bench
+Throughput (higher is better):
+  polling only:     379.7 tasks/sec (5.27s for 2000 tasks)
+  LISTEN/NOTIFY:    379.3 tasks/sec (5.27s for 2000 tasks)
+
+Queueing latency, enqueue -> lease (lower is better):
+  polling only:     p50=1052ms  p95=1907ms  p99=1907ms
+  LISTEN/NOTIFY:    p50=12ms  p95=42ms  p99=42ms
+```
+
+Throughput is statistically identical either way — expected, since every
+task in that phase is already queued before any worker starts polling,
+so there's nothing for a notification to shorten. Queueing latency is
+where it counts: **p50 drops ~85x (1052ms → 12ms), p95 drops ~45x (1907ms
+→ 42ms)** once the mechanism is actually wired correctly — the answer
+`docs/01-task-queue.md` deferred measuring back in M1. Design reasoning
+(why trace context has to ride through Postgres itself, why Jaeger runs
+separately from Grafana/Prometheus, why queue-depth gauges are
+leader-only, why the bench harness isn't k6) is in
+[`docs/07-observability.md`](./docs/07-observability.md).
+
 ## Status
 
-M0 through M6 complete. See
+M0 through M7 complete. See
 [`docs/plans/README.md`](./docs/plans/README.md) for the full milestone
 index.

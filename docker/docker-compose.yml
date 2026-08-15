@@ -17,5 +17,52 @@ services:
       timeout: 3s
       retries: 10
 
+  # M7's observability stack — Prometheus, Grafana, Jaeger — is behind
+  # its own profile so `docker compose up` alone (every earlier
+  # milestone's demo) is unaffected; it only starts when explicitly
+  # asked for via `--profile observability`. See docs/07-observability.md.
+  prometheus:
+    image: prom/prometheus:v3.1.0
+    container_name: karyakram-prometheus
+    restart: unless-stopped
+    profiles: [observability]
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    ports:
+      - '9090:9090'
+    # Node processes being scraped run on the host, not in Compose — this
+    # is what makes `host.docker.internal` resolve from inside the
+    # container on Linux (Docker Desktop maps it automatically; plain
+    # Linux Docker needs this explicit mapping).
+    extra_hosts:
+      - 'host.docker.internal:host-gateway'
+
+  grafana:
+    image: grafana/grafana:11.4.0
+    container_name: karyakram-grafana
+    restart: unless-stopped
+    profiles: [observability]
+    environment:
+      GF_AUTH_ANONYMOUS_ENABLED: 'true'
+      GF_AUTH_ANONYMOUS_ORG_ROLE: Admin
+      GF_AUTH_DISABLE_LOGIN_FORM: 'true'
+    volumes:
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+    ports:
+      - '3000:3000'
+    depends_on:
+      - prometheus
+
+  jaeger:
+    image: jaegertracing/all-in-one:1.65.0
+    container_name: karyakram-jaeger
+    restart: unless-stopped
+    profiles: [observability]
+    environment:
+      COLLECTOR_OTLP_ENABLED: 'true'
+    ports:
+      - '16686:16686' # trace search UI
+      - '4318:4318' # OTLP/HTTP ingestion
+
 volumes:
   karyakram_pgdata:

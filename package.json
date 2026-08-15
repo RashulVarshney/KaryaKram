@@ -21,7 +21,9 @@
     "demo:m3": "pnpm --filter @karyakram/worker-sdk run demo:m3",
     "demo:m4": "pnpm --filter @karyakram/worker-sdk run demo:m4",
     "demo:m5": "pnpm --filter @karyakram/api run demo:m5",
-    "demo:m6": "pnpm --filter @karyakram/scheduler run demo:m6"
+    "demo:m6": "pnpm --filter @karyakram/scheduler run demo:m6",
+    "demo:m7": "pnpm --filter @karyakram/scheduler run demo:m7",
+    "bench": "pnpm --filter @karyakram/bench run bench"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

@@ -85,6 +85,7 @@ const worker = new Worker(
     pollIntervalMs: envInt('POLL_INTERVAL_MS', 100),
     maxPollIntervalMs: envInt('MAX_POLL_INTERVAL_MS', 2_000),
     drainTimeoutMs: envInt('DRAIN_TIMEOUT_MS', 30_000),
+    notifyConnectionString: env('NOTIFY_CONNECTION_STRING'),
   },
   makeHandler(),
 );
