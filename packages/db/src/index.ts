@@ -19,3 +19,9 @@ export { withTransaction } from './transaction';
 
 export { appendEvents, getEvents } from './eventStore';
 export type { AppendEventsInput, AppendEventsResult } from './eventStore';
+
+export { computeRetryDelaySeconds } from './backoff';
+export type { RetryDelayOptions } from './backoff';
+
+export { listDeadTasks, requeueDeadTask } from './dlq';
+export type { DeadTask, ListDeadTasksInput, RequeueDeadTaskInput } from './dlq';

@@ -30,10 +30,27 @@ export function createActivityHandler(
     }
     const { activityType, input } = scheduled.event;
 
+    // Internal idempotency guard: if history already has an outcome for
+    // this scheduledEventSeq, don't run the function again. M1's per-task
+    // lease exclusivity already makes concurrent double-execution
+    // structurally rare, but this is a second, independent line of
+    // defense specifically against a redelivered task re-running an
+    // activity whose result is already durable. See docs/04-durability.md.
+    const alreadyHasOutcome = history.some(
+      (e) =>
+        (e.event.type === 'ActivityCompleted' || e.event.type === 'ActivityFailed') &&
+        e.event.scheduledEventSeq === scheduledSeq,
+    );
+    if (alreadyHasOutcome) {
+      return;
+    }
+
     const definition = registry.get(activityType);
     if (!definition) {
       throw new Error(`no activity registered for type "${activityType}"`);
     }
+
+    const idempotencyKey = `${task.workflowId}:${scheduledSeq}`;
 
     let outcomeEvent:
       | { type: 'ActivityCompleted'; scheduledEventSeq: number; result: unknown }
@@ -43,7 +60,7 @@ export function createActivityHandler(
           error: string;
         };
     try {
-      const result = await definition.fn(input);
+      const result = await definition.fn(input, { idempotencyKey });
       outcomeEvent = { type: 'ActivityCompleted', scheduledEventSeq: scheduled.seq, result };
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err);

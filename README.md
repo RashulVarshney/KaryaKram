@@ -148,8 +148,56 @@ in [`docs/03-replay.md`](./docs/03-replay.md).
 PASS: workflow completed after a mid-workflow kill -9, 'reserve' executed exactly once despite the crash.
 ```
 
+## M4 proof: a durable timer survives a full cluster restart
+
+Six sub-features: real exponential+jitter backoff, a queryable/actionable
+DLQ, durable timers (`ctx.sleep`), idempotency keys, signals
+(`ctx.waitForSignal` / `sendSignal`), and hard cancellation
+(`cancelWorkflow`). `pnpm demo:m4` starts a workflow with a short durable
+timer, `kill -9`'s **every** worker and the reaper mid-wait (a full
+cluster restart, not just one process), starts everything fresh, and
+proves the timer still fires and the workflow still completes — with
+neither activity's function body having run twice. Design reasoning (why
+a durable timer is just a task with a future `run_after`, why signals
+never need a command, why cancellation here is hard/engine-level and not
+cooperative, why idempotency is two smaller honest mechanisms rather than
+a framework) is in [`docs/04-durability.md`](./docs/04-durability.md).
+
+```
+== KaryaKram M4 demo ==
+
+1. Resetting DB...
+2. Starting workflow (activity -> 3s durable timer -> activity)...
+   workflowId = 05317a07-c3d9-4995-858a-f07b4d6f77f3
+3. Starting the cluster (reaper + app: activity/workflow/timer workers)...
+4. Waiting for the first activity to complete...
+5. Killing the ENTIRE cluster with SIGKILL (every worker + the reaper)...
+6. Starting a completely fresh cluster...
+7. Waiting for the durable timer to fire and the workflow to complete...
+
+8. Event log (workflow_events, seq order):
+   1. WorkflowStarted
+   2. ActivityScheduled (before-timer)
+   3. ActivityCompleted
+   4. TimerScheduled
+   5. TimerFired
+   6. ActivityScheduled (after-timer)
+   7. ActivityCompleted
+   8. WorkflowCompleted
+
+9. Activity execution counts (proves neither ran twice):
+   before-timer: 1
+   after-timer:  1
+
+PASS: durable timer fired and workflow completed after a full cluster restart.
+```
+
+The 3-second timer stands in for "5 minutes" — see the design note for
+why using a real 5-minute wait wouldn't make the demo any more
+convincing, just slower to run.
+
 ## Status
 
-M0 through M3 complete. See
+M0 through M4 complete. See
 [`docs/plans/README.md`](./docs/plans/README.md) for the full milestone
 index.

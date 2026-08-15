@@ -145,6 +145,7 @@ describe('queue.ts against real Postgres', () => {
         taskId: task.id,
         workerId: 'looper',
         error: `attempt ${i} failed`,
+        attempt: task.attempt,
       });
       expect(applied).toBe(true);
 

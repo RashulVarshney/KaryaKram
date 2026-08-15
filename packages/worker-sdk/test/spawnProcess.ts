@@ -138,6 +138,23 @@ export function spawnReserveChargeShipApp(options: SpawnAppOptions): SpawnedProc
   );
 }
 
+/** Spawns the timer-workflow example app (activity + workflow-replay + timer workers, one process). */
+export function spawnTimerWorkflowApp(options: SpawnAppOptions): SpawnedProcess {
+  return spawnTsx(
+    'src/bin/timer-workflow-app.ts',
+    {
+      ...process.env,
+      DATABASE_URL: options.databaseUrl,
+      WORKER_ID: options.workerId,
+      LEASE_SECONDS: String(options.leaseSeconds ?? 10),
+      HEARTBEAT_INTERVAL_MS: String(options.heartbeatIntervalMs ?? 2_000),
+      POLL_INTERVAL_MS: String(options.pollIntervalMs ?? 50),
+    },
+    '"msg":"worker starting"',
+    3, // activity, workflow, and timer workers each log this
+  );
+}
+
 export function waitForExit(child: ChildProcessWithoutNullStreams): Promise<number | null> {
   return new Promise((resolve) => {
     if (child.exitCode !== null) {

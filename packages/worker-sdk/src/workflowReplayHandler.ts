@@ -22,6 +22,16 @@ function commandToEvent(command: WorkflowCommand): WorkflowEventPayload {
       return { type: 'WorkflowCompleted', result: command.result };
     case 'FailWorkflow':
       return { type: 'WorkflowFailed', error: command.error };
+    case 'ScheduleTimer':
+      // The one place `Date.now()` is allowed to enter this whole flow:
+      // `replay()` (packages/core) only ever deals in the *duration* the
+      // workflow asked for, never an absolute time — this impure layer
+      // is what turns that into a real `fireAt` at the moment the
+      // decision becomes durable. See docs/04-durability.md.
+      return {
+        type: 'TimerScheduled',
+        fireAt: new Date(Date.now() + command.durationMs).toISOString(),
+      };
   }
 }
 
@@ -50,6 +60,30 @@ export function createWorkflowReplayHandler(
     const definition = registry.get(workflowType);
     if (!definition) {
       throw new Error(`no workflow registered for type "${workflowType}"`);
+    }
+
+    // Hard cancellation: checked *before* replay ever runs, not something
+    // workflow code can observe or react to. See docs/04-durability.md.
+    const alreadyTerminal = history.some(
+      (e) =>
+        e.event.type === 'WorkflowCompleted' ||
+        e.event.type === 'WorkflowFailed' ||
+        e.event.type === 'WorkflowCanceled',
+    );
+    const cancellationRequest = history.find((e) => e.event.type === 'CancellationRequested');
+    if (
+      cancellationRequest &&
+      cancellationRequest.event.type === 'CancellationRequested' &&
+      !alreadyTerminal
+    ) {
+      const reason = cancellationRequest.event.reason;
+      await withTransaction(pool, (client) =>
+        appendEvents(client, {
+          workflowId: task.workflowId,
+          events: [{ type: 'WorkflowCanceled', reason }],
+        }),
+      );
+      return;
     }
 
     let result;

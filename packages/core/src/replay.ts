@@ -5,10 +5,33 @@
  * ECMAScript spec, not the environment, so this produces identical
  * output for identical input every time, on any machine.
  */
-import type { ActivityScheduledEvent, StoredWorkflowEvent } from './workflow';
+import type {
+  ActivityScheduledEvent,
+  SignalReceivedEvent,
+  StoredWorkflowEvent,
+  TimerScheduledEvent,
+} from './workflow';
 
 export interface WorkflowContext {
   scheduleActivity<Result = unknown>(activityType: string, input: unknown): Promise<Result>;
+  /**
+   * Durable sleep. Takes a *duration*, never an absolute time —
+   * `packages/core` can't call `Date.now()`, so the actual `fireAt`
+   * timestamp is computed by the impure worker layer the first time this
+   * call's `ScheduleTimer` command is turned into a `TimerScheduled`
+   * event. Replay never needs to know "now"; it only ever asks "has the
+   * Nth timer fired yet."
+   */
+  sleep(durationMs: number): Promise<void>;
+  /**
+   * Resolves with the Nth `SignalReceived` payload for `signalName` (N =
+   * how many times this workflow has called `waitForSignal` with this
+   * same name so far), or hangs if that many haven't arrived yet. Never
+   * emits a command — a signal is pushed in from outside independently
+   * of what the workflow is doing; there's nothing for the engine to go
+   * create. See docs/04-durability.md.
+   */
+  waitForSignal<Payload = unknown>(signalName: string): Promise<Payload>;
 }
 
 export type WorkflowFn<Input = unknown, Result = unknown> = (
@@ -19,7 +42,8 @@ export type WorkflowFn<Input = unknown, Result = unknown> = (
 export type WorkflowCommand =
   | { type: 'ScheduleActivity'; activityType: string; input: unknown }
   | { type: 'CompleteWorkflow'; result: unknown }
-  | { type: 'FailWorkflow'; error: string };
+  | { type: 'FailWorkflow'; error: string }
+  | { type: 'ScheduleTimer'; durationMs: number };
 
 /**
  * Thrown when the currently-running code's Nth `scheduleActivity` call
@@ -60,6 +84,18 @@ function isActivityScheduled(
   return e.event.type === 'ActivityScheduled';
 }
 
+function isTimerScheduled(
+  e: StoredWorkflowEvent,
+): e is StoredWorkflowEvent & { event: TimerScheduledEvent } {
+  return e.event.type === 'TimerScheduled';
+}
+
+function isSignalReceived(
+  e: StoredWorkflowEvent,
+): e is StoredWorkflowEvent & { event: SignalReceivedEvent } {
+  return e.event.type === 'SignalReceived';
+}
+
 type ActivityOutcome = { kind: 'completed'; result: unknown } | { kind: 'failed'; error: string };
 
 // Bounded, not unlimited — see docs/03-replay.md. Generous relative to
@@ -73,18 +109,34 @@ export async function replay<Input = unknown, Result = unknown>(
   history: StoredWorkflowEvent[],
 ): Promise<ReplayResult> {
   const scheduledEvents = history.filter(isActivityScheduled);
+  const timerEvents = history.filter(isTimerScheduled);
+
+  const signalEventsByName = new Map<
+    string,
+    (StoredWorkflowEvent & { event: SignalReceivedEvent })[]
+  >();
+  for (const e of history.filter(isSignalReceived)) {
+    const arr = signalEventsByName.get(e.event.signalName) ?? [];
+    arr.push(e);
+    signalEventsByName.set(e.event.signalName, arr);
+  }
+  const signalCallIndexByName = new Map<string, number>();
 
   const outcomeBySeq = new Map<number, ActivityOutcome>();
+  const firedTimerSeqs = new Set<number>();
   for (const { event } of history) {
     if (event.type === 'ActivityCompleted') {
       outcomeBySeq.set(event.scheduledEventSeq, { kind: 'completed', result: event.result });
     } else if (event.type === 'ActivityFailed') {
       outcomeBySeq.set(event.scheduledEventSeq, { kind: 'failed', error: event.error });
+    } else if (event.type === 'TimerFired') {
+      firedTimerSeqs.add(event.scheduledEventSeq);
     }
   }
 
   const commands: WorkflowCommand[] = [];
   let callIndex = 0;
+  let timerCallIndex = 0;
   let nonDeterminismError: NonDeterminismError | null = null;
 
   const ctx: WorkflowContext = {
@@ -120,6 +172,43 @@ export async function replay<Input = unknown, Result = unknown>(
       commands.push({ type: 'ScheduleActivity', activityType, input: activityInput });
       return new Promise<T>(() => {
         /* never resolves — this pass ends here; the new command is what matters */
+      });
+    },
+
+    sleep(durationMs: number): Promise<void> {
+      const index = timerCallIndex++;
+      const scheduled = timerEvents[index];
+
+      if (scheduled) {
+        if (firedTimerSeqs.has(scheduled.seq)) {
+          return Promise.resolve();
+        }
+        // Scheduled but not yet fired — already in flight, nothing new to do this pass.
+        return new Promise<void>(() => {
+          /* never resolves — waiting on a timer already in flight */
+        });
+      }
+
+      // A genuinely new timer: not in history at all yet.
+      commands.push({ type: 'ScheduleTimer', durationMs });
+      return new Promise<void>(() => {
+        /* never resolves — this pass ends here; the new command is what matters */
+      });
+    },
+
+    waitForSignal<P>(signalName: string): Promise<P> {
+      const index = signalCallIndexByName.get(signalName) ?? 0;
+      signalCallIndexByName.set(signalName, index + 1);
+
+      const matched = signalEventsByName.get(signalName)?.[index];
+      if (matched) {
+        return Promise.resolve(matched.event.payload as P);
+      }
+
+      // No command emitted, ever: nothing for the engine to schedule —
+      // see the WorkflowContext doc comment.
+      return new Promise<P>(() => {
+        /* never resolves — no matching signal has arrived yet */
       });
     },
   };

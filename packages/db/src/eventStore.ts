@@ -79,13 +79,22 @@ export async function appendEvents(
         workflowId,
         scheduledEventSeq: stored.seq,
       });
+    } else if (stored.event.type === 'TimerScheduled') {
+      // A durable timer is just a task whose run_after is in the future
+      // (M1's dequeue query already only picks up run_after <= now()) —
+      // see docs/04-durability.md. No new queue primitive needed.
+      await enqueue(client, {
+        taskType: 'timer',
+        workflowId,
+        scheduledEventSeq: stored.seq,
+        runAfter: new Date(stored.event.fireAt),
+      });
     }
   }
 
-  // Signals the future M3 replay worker that there's new history — no-op
-  // (returns null) if a workflow task is already pending/leased, per M1's
-  // one-workflow-task-at-a-time invariant. Nothing consumes this queue
-  // yet in M2; see docs/02-event-store.md's "scope" section.
+  // Signals the replay worker that there's new history to look at —
+  // no-op (returns null) if a workflow task is already pending/leased,
+  // per M1's one-workflow-task-at-a-time invariant.
   await enqueue(client, { taskType: 'workflow', workflowId });
 
   const allEvents = await getEvents(client, workflowId);

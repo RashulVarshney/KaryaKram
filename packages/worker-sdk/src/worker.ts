@@ -112,6 +112,7 @@ export class Worker {
           taskId: task.id,
           workerId: this.config.workerId,
           error: message,
+          attempt: task.attempt,
         });
         if (applied) {
           log.warn({ err }, 'task failed');

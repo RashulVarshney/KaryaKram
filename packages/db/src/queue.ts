@@ -1,4 +1,5 @@
 import type { Pool, PoolClient } from 'pg';
+import { computeRetryDelaySeconds } from './backoff';
 
 /**
  * Every queue function takes a Pool or an already-checked-out PoolClient,
@@ -7,7 +8,7 @@ import type { Pool, PoolClient } from 'pg';
  */
 export type Queryable = Pool | PoolClient;
 
-export type TaskType = 'workflow' | 'activity';
+export type TaskType = 'workflow' | 'activity' | 'timer';
 export type TaskStatus = 'pending' | 'leased' | 'completed' | 'dead';
 
 export interface Task {
@@ -247,18 +248,19 @@ export interface FailInput {
   taskId: string;
   workerId: string;
   error: string;
+  /** The task's current attempt count (from the `Task` returned by `dequeue`) — used to compute jittered backoff. */
+  attempt: number;
 }
-
-// TODO(M4): replace with real exponential backoff + jitter. Fixed for M1.
-const RETRY_BACKOFF_SECONDS = 30;
 
 /**
  * Records a failed attempt. Dead-letters the task once `max_attempts` is
- * reached; otherwise puts it back to `pending` after a fixed backoff.
- * Guarded by ownership the same way `complete` is.
+ * reached; otherwise puts it back to `pending` after a full-jitter
+ * exponential backoff (see docs/04-durability.md). Guarded by ownership
+ * the same way `complete` is.
  */
 export async function fail(client: Queryable, input: FailInput): Promise<boolean> {
-  const { taskId, workerId, error } = input;
+  const { taskId, workerId, error, attempt } = input;
+  const delaySeconds = computeRetryDelaySeconds(attempt);
 
   const result = await client.query(
     `UPDATE tasks
@@ -273,7 +275,7 @@ export async function fail(client: Queryable, input: FailInput): Promise<boolean
       WHERE id = $1
         AND leased_by = $2
         AND status = 'leased'`,
-    [taskId, workerId, RETRY_BACKOFF_SECONDS, error],
+    [taskId, workerId, delaySeconds, error],
   );
 
   return (result.rowCount ?? 0) > 0;

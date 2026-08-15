@@ -32,7 +32,22 @@ export function defineWorkflow<Input = unknown, Result = unknown>(
 // eslint-disable-next-line @typescript-eslint/no-explicit-any -- see comment above
 export type AnyWorkflowDefinition = WorkflowDefinition<any, any>;
 
-export type ActivityFn<Input = unknown, Result = unknown> = (input: Input) => Promise<Result>;
+export interface ActivityContext {
+  /**
+   * Stable, deterministic, unique per activity invocation slot
+   * (`${workflowId}:${scheduledEventSeq}`) — hand this to a real external
+   * system's own idempotency-key parameter (Stripe, etc.) so *it* can
+   * dedupe the actual side effect. Pushes the at-least-once boundary
+   * further toward effective-once; doesn't remove it. See
+   * docs/04-durability.md.
+   */
+  idempotencyKey: string;
+}
+
+export type ActivityFn<Input = unknown, Result = unknown> = (
+  input: Input,
+  ctx: ActivityContext,
+) => Promise<Result>;
 
 export interface ActivityDefinition<Input = unknown, Result = unknown> {
   activityType: string;

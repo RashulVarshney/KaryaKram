@@ -17,11 +17,15 @@ export type {
   WorkflowDefinition,
   AnyWorkflowDefinition,
   ActivityFn,
+  ActivityContext,
   ActivityDefinition,
   AnyActivityDefinition,
 } from './authoring';
 
 export { startWorkflow } from './startWorkflow';
+export { sendSignal } from './sendSignal';
+export { cancelWorkflow } from './cancelWorkflow';
 
 export { createWorkflowReplayHandler } from './workflowReplayHandler';
 export { createActivityHandler } from './activityHandler';
+export { createTimerHandler } from './timerHandler';
