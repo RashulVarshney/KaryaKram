@@ -29,3 +29,11 @@ export { cancelWorkflow } from './cancelWorkflow';
 export { createWorkflowReplayHandler } from './workflowReplayHandler';
 export { createActivityHandler } from './activityHandler';
 export { createTimerHandler } from './timerHandler';
+
+export {
+  reserveChargeShip,
+  createReserveChargeShipActivities,
+  ensureActivityExecutionsTable,
+  getActivityExecutionCount,
+} from './examples/reserveChargeShip';
+export type { OrderInput, OrderResult } from './examples/reserveChargeShip';

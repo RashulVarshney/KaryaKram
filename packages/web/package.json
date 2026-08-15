@@ -2,10 +2,25 @@
   "name": "@karyakram/web",
   "version": "0.0.0",
   "private": true,
-  "description": "React control plane (DAG view, live SSE, time-travel debugger). Empty until M5 — real toolchain (Vite) gets set up then.",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "description": "React control plane: workflow list, DAG view, live SSE, time-travel debugger.",
+  "type": "module",
   "scripts": {
-    "build": "tsc -b"
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "typecheck": "tsc --noEmit",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@karyakram/core": "workspace:*",
+    "@xyflow/react": "^12.11.3",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8"
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.4",
+    "@vitejs/plugin-react": "^6.0.5",
+    "typescript": "^6.0.3",
+    "vite": "^8.2.1"
   }
 }

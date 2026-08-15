@@ -8,18 +8,19 @@
     "node": ">=22"
   },
   "scripts": {
-    "build": "tsc -b",
+    "build": "tsc -b && pnpm --filter @karyakram/web run build",
     "test": "pnpm run test:unit && pnpm run test:integration",
     "test:unit": "vitest run --project unit",
     "test:integration": "vitest run --project integration",
     "lint": "eslint .",
     "format": "prettier --write .",
-    "typecheck": "tsc -b --force",
+    "typecheck": "tsc -b --force && pnpm --filter @karyakram/web run typecheck",
     "db:migrate": "pnpm --filter @karyakram/db run migrate:up",
     "db:rollback": "pnpm --filter @karyakram/db run migrate:down",
     "demo:m1": "pnpm --filter @karyakram/worker-sdk run demo",
     "demo:m3": "pnpm --filter @karyakram/worker-sdk run demo:m3",
-    "demo:m4": "pnpm --filter @karyakram/worker-sdk run demo:m4"
+    "demo:m4": "pnpm --filter @karyakram/worker-sdk run demo:m4",
+    "demo:m5": "pnpm --filter @karyakram/api run demo:m5"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

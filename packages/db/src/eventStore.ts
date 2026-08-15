@@ -123,3 +123,16 @@ export async function getEvents(
   );
   return rows.map((r) => ({ seq: Number(r.seq), event: r.payload }));
 }
+
+/** For M5's SSE endpoint: only the events a client hasn't seen yet, rather than refetching full history on every poll tick. */
+export async function getEventsSince(
+  client: Queryable,
+  workflowId: string,
+  sinceSeq: number,
+): Promise<StoredWorkflowEvent[]> {
+  const { rows } = await client.query<WorkflowEventRow>(
+    'SELECT seq, payload FROM workflow_events WHERE workflow_id = $1 AND seq > $2 ORDER BY seq',
+    [workflowId, sinceSeq],
+  );
+  return rows.map((r) => ({ seq: Number(r.seq), event: r.payload }));
+}

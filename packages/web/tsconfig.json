@@ -1,8 +1,31 @@
 {
-  "extends": "../../tsconfig.base.json",
+  // Deliberately not extending ../../tsconfig.base.json: that config is
+  // shaped for Node library packages built by `tsc -b` project references
+  // (NodeNext resolution, composite, declaration output). Vite bundles
+  // this package itself (esbuild/rollup, not tsc), so this is a
+  // browser-target, noEmit config instead — the same strictness flags,
+  // different module/lib settings. Not part of the root tsc project
+  // reference graph for the same reason (see root tsconfig.json).
   "compilerOptions": {
-    "outDir": "dist",
-    "rootDir": "src"
+    "target": "ES2023",
+    "lib": ["ES2023", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "jsx": "react-jsx",
+
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "noImplicitOverride": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true
   },
   "include": ["src"]
 }

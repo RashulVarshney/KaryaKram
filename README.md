@@ -196,8 +196,49 @@ The 3-second timer stands in for "5 minutes" — see the design note for
 why using a real 5-minute wait wouldn't make the demo any more
 convincing, just slower to run.
 
+## M5 proof: a browser-side time-travel debugger
+
+The first HTTP surface (`packages/api`, Fastify) and the first React
+frontend (`packages/web`, Vite). `pnpm demo:m5` starts a worker cluster,
+the API, and the Vite dev server; opening the UI lists workflows, and
+picking one loads its full event history once, then a scrubber
+re-derives the workflow's state at any point purely by re-running
+`foldEvents` — the exact same, unmodified function from M2 — client-side,
+in the browser, with zero network requests per scrub. New events append
+live via a polling SSE endpoint. Design reasoning (why the scrubber runs
+in the browser rather than the server, why live updates are polling-based
+SSE rather than `LISTEN/NOTIFY`, why the DAG view is honest about only
+having ever rendered sequential chains) is in
+[`docs/05-control-plane.md`](./docs/05-control-plane.md).
+
+**Honestly scoped verification**: no browser automation tool was
+available while building this milestone. What was verified directly: the
+full stack was started for real and a workflow was driven through it via
+the actual HTTP API, producing the exact expected event history; the
+frontend build (`vite build`) and typecheck both pass; every React source
+file was fetched from the running Vite dev server and confirmed to
+transform and serve without error. What wasn't verified is the actual
+rendered DOM — the DAG's visual layout and the scrubber's drag behavior
+were not seen firsthand. See the design note's "Implementation notes" for
+the full account.
+
+```
+$ curl -s http://localhost:3001/workflows | python3 -m json.tool
+{
+    "workflows": [
+        {
+            "id": "49c4a48b-2738-4a13-a364-59470aaff733",
+            "workflowType": "reserve-charge-ship",
+            "status": "COMPLETED",
+            "createdAt": "2026-08-15T01:12:01.227Z",
+            "updatedAt": "2026-08-15T01:12:06.831Z"
+        }
+    ]
+}
+```
+
 ## Status
 
-M0 through M4 complete. See
+M0 through M5 complete. See
 [`docs/plans/README.md`](./docs/plans/README.md) for the full milestone
 index.

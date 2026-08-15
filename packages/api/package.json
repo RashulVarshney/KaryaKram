@@ -2,14 +2,26 @@
   "name": "@karyakram/api",
   "version": "0.0.0",
   "private": true,
-  "description": "HTTP surface for the control plane. Empty until M5.",
+  "description": "Read-mostly HTTP surface for the control plane: list workflows, fetch history, SSE live updates.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "build": "tsc -b"
+    "build": "tsc -b",
+    "serve": "dotenv -e ../../.env -- tsx src/bin/serve.ts",
+    "demo:m5": "dotenv -e ../../.env -- tsx src/bin/demo-m5.ts"
   },
   "dependencies": {
+    "@fastify/cors": "^11.3.0",
     "@karyakram/core": "workspace:*",
-    "@karyakram/db": "workspace:*"
+    "@karyakram/db": "workspace:*",
+    "@karyakram/worker-sdk": "workspace:*",
+    "fastify": "^5.12.0",
+    "pg": "^8.23.0"
+  },
+  "devDependencies": {
+    "@testcontainers/postgresql": "^12.1.0",
+    "@types/pg": "^8.21.0",
+    "dotenv-cli": "^11.0.0",
+    "testcontainers": "^12.1.0"
   }
 }

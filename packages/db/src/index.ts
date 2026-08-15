@@ -17,8 +17,11 @@ export type {
 
 export { withTransaction } from './transaction';
 
-export { appendEvents, getEvents } from './eventStore';
+export { appendEvents, getEvents, getEventsSince } from './eventStore';
 export type { AppendEventsInput, AppendEventsResult } from './eventStore';
+
+export { listWorkflowExecutions, getWorkflowExecution } from './workflowExecutions';
+export type { WorkflowExecutionSummary } from './workflowExecutions';
 
 export { computeRetryDelaySeconds } from './backoff';
 export type { RetryDelayOptions } from './backoff';
