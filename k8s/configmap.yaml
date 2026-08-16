@@ -1,0 +1,10 @@
+# Shared env, same as every process reads locally (see .env.example).
+# Per-process env (SCHEDULER_ID, WORKER_ID, etc.) stays inline in each
+# Deployment spec instead of duplicated here — see docs/08-kubernetes.md.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: karyakram-config
+data:
+  DATABASE_URL: postgres://karyakram:karyakram@postgres:5432/karyakram
+  LOG_LEVEL: info

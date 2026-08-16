@@ -1,0 +1,79 @@
+# Single replica — this milestone doesn't attempt HA Postgres, matching
+# docker/docker-compose.yml's own scope. Same image/credentials as that
+# file. See docs/08-kubernetes.md.
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: postgres-data
+spec:
+  accessModes: [ReadWriteOnce]
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres
+spec:
+  replicas: 1
+  selector:
+    matchLabels: { app: postgres }
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels: { app: postgres }
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:16
+          ports:
+            - containerPort: 5432
+          env:
+            - { name: POSTGRES_USER, value: karyakram }
+            - { name: POSTGRES_PASSWORD, value: karyakram }
+            - { name: POSTGRES_DB, value: karyakram }
+          volumeMounts:
+            - { name: data, mountPath: /var/lib/postgresql/data }
+          readinessProbe:
+            exec:
+              command: [pg_isready, -U, karyakram, -d, karyakram]
+            initialDelaySeconds: 5
+            periodSeconds: 3
+          livenessProbe:
+            exec:
+              command: [pg_isready, -U, karyakram, -d, karyakram]
+            initialDelaySeconds: 10
+            periodSeconds: 10
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: postgres-data
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres
+spec:
+  selector: { app: postgres }
+  ports:
+    - port: 5432
+      targetPort: 5432
+---
+# NodePort so the demo script (running on the host, not in the cluster)
+# can start/inspect workflows directly — the same `startWorkflow`/
+# `getEvents` code every prior milestone's demo already uses, just
+# pointed here instead of docker-compose's Postgres. Not for the browser.
+# See docs/08-kubernetes.md and k8s/kind-config.yaml.
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-demo
+spec:
+  type: NodePort
+  selector: { app: postgres }
+  ports:
+    - port: 5432
+      targetPort: 5432
+      nodePort: 30432

@@ -1,0 +1,13 @@
+# kubectl apply -k k8s/ applies everything below in one command.
+# migrate-job.yaml is deliberately NOT listed here — it has to run to
+# completion before the rest, not just get created alongside them; the
+# demo script applies and waits on it separately. See docs/08-kubernetes.md.
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - configmap.yaml
+  - postgres.yaml
+  - scheduler.yaml
+  - worker.yaml
+  - api.yaml
+  - web.yaml

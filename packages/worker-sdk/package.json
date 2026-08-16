@@ -11,7 +11,8 @@
     "reaper": "dotenv -e ../../.env -- tsx src/bin/run-reaper.ts",
     "demo": "dotenv -e ../../.env -- tsx src/bin/demo.ts",
     "demo:m3": "dotenv -e ../../.env -- tsx src/bin/demo-m3.ts",
-    "demo:m4": "dotenv -e ../../.env -- tsx src/bin/demo-m4.ts"
+    "demo:m4": "dotenv -e ../../.env -- tsx src/bin/demo-m4.ts",
+    "demo:m8": "tsx src/bin/demo-m8.ts"
   },
   "dependencies": {
     "@karyakram/core": "workspace:*",

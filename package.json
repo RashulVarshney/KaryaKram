@@ -23,6 +23,7 @@
     "demo:m5": "pnpm --filter @karyakram/api run demo:m5",
     "demo:m6": "pnpm --filter @karyakram/scheduler run demo:m6",
     "demo:m7": "pnpm --filter @karyakram/scheduler run demo:m7",
+    "demo:m8": "pnpm --filter @karyakram/worker-sdk run demo:m8",
     "bench": "pnpm --filter @karyakram/bench run bench"
   },
   "devDependencies": {

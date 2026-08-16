@@ -1,0 +1,22 @@
+# Maps fixed host ports to the API/web NodePorts so the browser (and the
+# demo script) can reach them at a known, stable address — see
+# docs/08-kubernetes.md and packages/web/Dockerfile's VITE_API_BASE_URL.
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+nodes:
+  - role: control-plane
+    extraPortMappings:
+      - containerPort: 30080
+        hostPort: 8080
+        protocol: TCP
+      - containerPort: 30081
+        hostPort: 8081
+        protocol: TCP
+      # Not for the browser — for the demo script itself, which needs to
+      # start/inspect workflows the same way every prior milestone's demo
+      # did, just pointed at the in-cluster Postgres instead of
+      # docker-compose's. 15432, not 5432, so it doesn't collide with the
+      # docker-compose Postgres other demos already use on this host.
+      - containerPort: 30432
+        hostPort: 15432
+        protocol: TCP

@@ -1,0 +1,29 @@
+# Runs the same timer-workflow "app" process M4's demo already used
+# (activity + workflow-replay + timer worker together) — unmodified.
+# Durable timers are the more distinctive proof for this milestone's
+# worker-pod chaos check: a timer pending when the pod handling it dies
+# still has to fire once a fresh pod picks it up. See docs/08-kubernetes.md.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: worker
+spec:
+  replicas: 2
+  selector:
+    matchLabels: { app: worker }
+  template:
+    metadata:
+      labels: { app: worker }
+    spec:
+      containers:
+        - name: worker
+          image: karyakram-app:latest
+          imagePullPolicy: IfNotPresent
+          workingDir: /repo
+          command: [node, packages/worker-sdk/dist/bin/timer-workflow-app.js]
+          env:
+            - name: WORKER_ID
+              valueFrom:
+                fieldRef: { fieldPath: metadata.name }
+          envFrom:
+            - configMapRef: { name: karyakram-config }

@@ -1,0 +1,27 @@
+# Runs once against the in-cluster Postgres before any app Deployment
+# starts doing real work — applied and waited-on separately by the demo
+# script, not bundled into the one-shot kustomize apply, since it has to
+# run to completion *before* the rest, not just get created alongside it.
+# See docs/08-kubernetes.md.
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: karyakram-migrate
+spec:
+  backoffLimit: 2
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: migrate
+          image: karyakram-app:latest
+          imagePullPolicy: IfNotPresent
+          workingDir: /repo
+          # node-pg-migrate is a devDependency of packages/db specifically,
+          # so pnpm links its bin there, not at the repo root's
+          # node_modules/.bin — found by actually running this in a real
+          # pod rather than assumed. See docs/08-kubernetes.md.
+          command:
+            ['packages/db/node_modules/.bin/node-pg-migrate', 'up', '-m', 'packages/db/migrations']
+          envFrom:
+            - configMapRef: { name: karyakram-config }

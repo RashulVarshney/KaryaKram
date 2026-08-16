@@ -1,0 +1,26 @@
+# 3 replicas so leader election (M6) actually has something to elect
+# among, in-cluster. See docs/08-kubernetes.md.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: scheduler
+spec:
+  replicas: 3
+  selector:
+    matchLabels: { app: scheduler }
+  template:
+    metadata:
+      labels: { app: scheduler }
+    spec:
+      containers:
+        - name: scheduler
+          image: karyakram-app:latest
+          imagePullPolicy: IfNotPresent
+          workingDir: /repo
+          command: [node, packages/scheduler/dist/bin/run-scheduler.js]
+          env:
+            - name: SCHEDULER_ID
+              valueFrom:
+                fieldRef: { fieldPath: metadata.name }
+          envFrom:
+            - configMapRef: { name: karyakram-config }

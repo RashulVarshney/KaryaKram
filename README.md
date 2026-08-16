@@ -330,8 +330,51 @@ separately from Grafana/Prometheus, why queue-depth gauges are
 leader-only, why the bench harness isn't k6) is in
 [`docs/07-observability.md`](./docs/07-observability.md).
 
+## M8 proof: the same crash-recovery guarantees, under a real orchestrator
+
+M8 proves nothing new — every guarantee it checks was already proven
+locally in M1/M3/M4/M6. What changes is the infrastructure underneath:
+`pnpm demo:m8` builds two Docker images (one shared Node image for the
+API/scheduler/worker processes, one nginx image for the built web
+frontend — see the design note for why not five images or a Helm
+chart), stands up a real local `kind` cluster, deploys the whole system
+with one `kubectl apply -k k8s/`, then actually deletes real pods —
+not a simulated failure — to check the same things M1's `kill -9` demo
+and M6's leader-failover demo already checked, now under Kubernetes's
+own pod lifecycle instead of a locally spawned process.
+
+```
+7. Chaos check 1: kill the worker pod mid-timer-workflow...
+   workflowId = d8188053-2a61-4357-b308-47cd415ac5ad
+   deleting pod/worker-7f5bfbcbb6-fj4xj with --grace-period=0...
+   before-timer executions: 1, after-timer executions: 1 — PASS
+
+8. Chaos check 2: kill the scheduler leader pod...
+   current leader = scheduler-5648dfdd8f-c5s87
+   deleting pod/scheduler-5648dfdd8f-c5s87 with --grace-period=0...
+   new leader = scheduler-5648dfdd8f-4b5zl, failover took 566ms — PASS
+
+PASS: worker-pod and scheduler-leader chaos checks both hold under a real Kubernetes cluster.
+```
+
+**Found by actually running it, not by inspection**: the migration Job
+initially pointed at `node_modules/.bin/node-pg-migrate` relative to the
+image's `/repo` working directory and failed immediately —
+`node-pg-migrate` is a devDependency of `packages/db` specifically, so
+pnpm links its executable at `packages/db/node_modules/.bin/`, not the
+workspace root. Confirmed with `docker run --entrypoint sh` against the
+built image, fixed, then reconfirmed by running the Job to completion in
+a real pod — the same category of gap M7's dead `pg_notify` bug came
+from: something that looks right until it actually runs. Design
+reasoning (why `kind` not minikube — confirmed to actually work in this
+environment before any of this was written, why plain manifests +
+`kustomize` not Helm, why observability-in-Kubernetes is explicitly out
+of scope, why the chaos checks reuse M4's timer workflow and M6's leader
+election instead of inventing new scenarios) is in
+[`docs/08-kubernetes.md`](./docs/08-kubernetes.md).
+
 ## Status
 
-M0 through M7 complete. See
+M0 through M8 complete — every milestone in the original roadmap. See
 [`docs/plans/README.md`](./docs/plans/README.md) for the full milestone
 index.

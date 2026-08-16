@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api
+spec:
+  replicas: 1
+  selector:
+    matchLabels: { app: api }
+  template:
+    metadata:
+      labels: { app: api }
+    spec:
+      containers:
+        - name: api
+          image: karyakram-app:latest
+          imagePullPolicy: IfNotPresent
+          workingDir: /repo
+          command: [node, packages/api/dist/bin/serve.js]
+          env:
+            - { name: PORT, value: '3001' }
+          envFrom:
+            - configMapRef: { name: karyakram-config }
+          ports:
+            - containerPort: 3001
+---
+# NodePort, not ClusterIP — a browser on the host needs to reach this
+# directly. Fixed at 30081 to match k8s/kind-config.yaml's port mapping
+# and the VITE_API_BASE_URL baked into the web image. See docs/08-kubernetes.md.
+apiVersion: v1
+kind: Service
+metadata:
+  name: api
+spec:
+  type: NodePort
+  selector: { app: api }
+  ports:
+    - port: 3001
+      targetPort: 3001
+      nodePort: 30081
