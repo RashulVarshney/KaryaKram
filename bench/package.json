@@ -2,13 +2,20 @@
   "name": "@karyakram/bench",
   "version": "0.0.0",
   "private": true,
-  "description": "Measured before/after numbers for M6's LISTEN/NOTIFY change — plain TypeScript, not k6. See docs/07-observability.md.",
+  "description": "Measured before/after numbers for M6's LISTEN/NOTIFY change \u2014 plain TypeScript, not k6. See docs/07-observability.md.",
   "scripts": {
     "build": "tsc -b",
-    "bench": "dotenv -e ../.env -- tsx src/queueThroughput.ts"
+    "bench": "dotenv -e ../.env -- tsx src/queueThroughput.ts",
+    "chaos:llm": "dotenv -e ../.env -- tsx src/llmChaos.ts",
+    "bench:llm": "dotenv -e ../.env -- tsx src/llmBench.ts"
   },
   "dependencies": {
-    "@karyakram/db": "workspace:*"
+    "@karyakram/core": "workspace:*",
+    "@karyakram/db": "workspace:*",
+    "@karyakram/llm": "workspace:*",
+    "@karyakram/worker-sdk": "workspace:*",
+    "node-pg-migrate": "^9.0.0",
+    "pg": "^8.23.0"
   },
   "devDependencies": {
     "@types/pg": "^8.21.0",

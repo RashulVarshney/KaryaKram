@@ -92,3 +92,23 @@ Open choices made without asking, recorded as they come up. Newest at the bottom
     hash-tagged echo (`mock(<digest>): ...`), so in the demo the `category` field is that string,
     not billing/technical/etc. The workflow, durability and side effects are real; the model
     output is placeholder text. A real category requires `LLM_PROVIDER=anthropic`.
+22. **Chaos harness waits for the queue to go quiet before counting provider calls.** My first
+    version counted as soon as the workflow finished. Mutation testing (disabling the "outcome
+    already recorded -> don't call again" guard) showed it passed anyway: in `after_persist` crashes
+    the dead worker's stale `llm` task is only reclaimed ~2s later, after the workflow has already
+    completed. The harness now keeps the replacement worker and reaper running until no task is
+    pending/leased. With the guard disabled it now fails with "persisted_before_crash had 2
+    provider calls"; with it enabled it is clean. (Mutations are applied to `src` of worker-sdk,
+    which the spawned workers load directly.)
+23. **Recovery time is only reported for runs that actually had something to recover.** A
+    `random_delay` kill can land after the workflow finished; those runs record
+    `completedBeforeCrash: true` and no recovery time instead of a meaningless ~0ms.
+24. **`llm-agent-app` enables the M6 `LISTEN/NOTIFY` wake-up when `NOTIFY_CONNECTION_STRING` is
+    set** (the chaos harness and `demo:llm` set it). Without it, a respawned worker's idle poll
+    backoff reached its 2s ceiling and every step after a recovery paid ~2s; recovery after a
+    provider-then-crash fault measured ~13s before and ~2.5s after (dominated by the 2s lease
+    expiry plus process boot). That is an infrastructure latency, not an engine property.
+25. **Chaos runs are slow by construction** (a real process spawn plus lease expiry per run,
+    ~5-8s each), so the integration test defaults to N=50 (~5 min) and is tunable with
+    `KARYAKRAM_CHAOS_RUNS`. `pnpm chaos:llm` runs the same harness against a throwaway database
+    and saves raw per-run JSON under `docs/results/`.

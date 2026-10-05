@@ -38,7 +38,12 @@ async function main(): Promise<void> {
   );
   const worker = spawn(process.execPath, ['--import', TSX_LOADER, 'src/bin/llm-agent-app.ts'], {
     cwd: WORKER_SDK_DIR,
-    env: { ...process.env, LOG_LEVEL: 'warn' },
+    env: {
+      ...process.env,
+      LOG_LEVEL: 'warn',
+      NOTIFY_CONNECTION_STRING:
+        process.env['NOTIFY_CONNECTION_STRING'] ?? process.env['DATABASE_URL'] ?? '',
+    },
     stdio: ['ignore', 'inherit', 'inherit'],
   });
   let workerExited = false;

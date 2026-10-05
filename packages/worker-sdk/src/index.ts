@@ -63,3 +63,13 @@ export { supportTicketTriage, sampleTicket } from './examples/supportTriage';
 export type { TriageInput, TriageResult } from './examples/supportTriage';
 export { createSupportToolRegistry } from './examples/supportTools';
 export type { Customer, SentReply } from './examples/supportTools';
+
+export { runChaos, summarize, CHAOS_FAULTS } from './chaos/chaosRunner';
+export type {
+  ChaosOptions,
+  ChaosRunResult,
+  ChaosSummary,
+  ChaosFault,
+  StepWindow,
+  StepAudit,
+} from './chaos/chaosRunner';

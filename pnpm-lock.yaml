@@ -41,9 +41,24 @@ importers:
 
   bench:
     dependencies:
+      '@karyakram/core':
+        specifier: workspace:*
+        version: link:../packages/core
       '@karyakram/db':
         specifier: workspace:*
         version: link:../packages/db
+      '@karyakram/llm':
+        specifier: workspace:*
+        version: link:../packages/llm
+      '@karyakram/worker-sdk':
+        specifier: workspace:*
+        version: link:../packages/worker-sdk
+      node-pg-migrate:
+        specifier: ^9.0.0
+        version: 9.0.0(@types/pg@8.21.0)(pg@8.23.0)
+      pg:
+        specifier: ^8.23.0
+        version: 8.23.0
     devDependencies:
       '@types/pg':
         specifier: ^8.21.0

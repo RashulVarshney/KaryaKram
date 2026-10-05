@@ -39,6 +39,11 @@ async function main(): Promise<void> {
     leaseSeconds: envInt('LEASE_SECONDS', 10),
     heartbeatIntervalMs: envInt('HEARTBEAT_INTERVAL_MS', 2_000),
     pollIntervalMs: envInt('POLL_INTERVAL_MS', 20),
+    // LISTEN/NOTIFY wake-up (M6): without it an idle worker's poll backoff climbs to
+    // its 2s ceiling, which is then paid again by every step after a crash recovery.
+    ...(process.env['NOTIFY_CONNECTION_STRING']
+      ? { notifyConnectionString: process.env['NOTIFY_CONNECTION_STRING'] }
+      : {}),
   };
 
   const workers = [
