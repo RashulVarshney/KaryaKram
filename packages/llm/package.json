@@ -1,0 +1,16 @@
+{
+  "name": "@karyakram/llm",
+  "version": "0.0.0",
+  "private": true,
+  "description": "LLM provider abstraction: a typed provider interface, a deterministic mock provider and an Anthropic provider.",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc -b"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.131.0",
+    "@karyakram/core": "workspace:*",
+    "@karyakram/db": "workspace:*"
+  }
+}

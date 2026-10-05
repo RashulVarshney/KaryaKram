@@ -29,3 +29,14 @@ export type {
   ReplayStatus,
   ReplayResult,
 } from './replay';
+
+export { canonicalJson, canonicalLlmRequest, canonicalToolCall, normalizeLlmRequest } from './llm';
+export type {
+  LlmRole,
+  LlmMessage,
+  LlmToolDefinition,
+  LlmRequest,
+  LlmToolCall,
+  LlmCallResult,
+  NormalizedLlmRequest,
+} from './llm';

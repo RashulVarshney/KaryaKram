@@ -47,3 +47,6 @@ export {
   getCurrentLeader,
 } from './leadership';
 export type { CurrentLeader } from './leadership';
+
+export { recordProviderCall, listProviderCalls, countProviderCallsByStep } from './providerAudit';
+export type { ProviderCallRecord, ProviderCallRow } from './providerAudit';

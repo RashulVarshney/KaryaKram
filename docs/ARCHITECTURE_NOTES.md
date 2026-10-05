@@ -10,7 +10,7 @@ the browser debugger, so it can't import `node:crypto`.
 
 **Replay is the only way workflow code runs.** `replay(fn, input, history)` (`core/replay.ts`)
 re-executes the workflow function from the top against history. `ctx.scheduleActivity` is matched
-to the Nth `ActivityScheduled` event *by call position* (no ids): completed -> resolve with the
+to the Nth `ActivityScheduled` event _by call position_ (no ids): completed -> resolve with the
 recorded result, failed -> reject, scheduled-but-open -> never resolves, absent -> emit a
 `ScheduleActivity` **command** and hang. Commands are not events: the impure
 `workflowReplayHandler` turns them into events and calls `appendEvents`. A type mismatch at a
