@@ -4,6 +4,8 @@
  * no matter who calls it or when (see docs/02-event-store.md).
  */
 
+import type { LlmRequest, LlmToolCall } from './llm';
+
 export interface WorkflowStartedEvent {
   type: 'WorkflowStarted';
   workflowType: string;
@@ -68,6 +70,92 @@ export interface WorkflowCanceledEvent {
   reason?: string;
 }
 
+/**
+ * How much of the request was persisted in `LLM_REQUESTED`. Only `full`
+ * is safe to send to a provider as-is; for the others the executing
+ * worker recovers the exact request by re-deriving it from the workflow
+ * function (see `replay`'s `pendingLlmRequests`).
+ */
+export type LlmRequestStorage = 'full' | 'redacted' | 'truncated' | 'none';
+
+export interface LlmRequestedEvent {
+  type: 'LLM_REQUESTED';
+  /** Deterministic, derived from call position: `llm-0`, `llm-1`, ... */
+  stepId: string;
+  /** sha256 of the canonical JSON of (model, messages, params, tools). */
+  requestHash: string;
+  requestStorage: LlmRequestStorage;
+  /** Absent when `requestStorage` is `none`. */
+  request?: LlmRequest;
+  /** Max provider attempts before the task is dead-lettered. */
+  maxAttempts: number;
+}
+
+export interface LlmCompletedEvent {
+  type: 'LLM_COMPLETED';
+  stepId: string;
+  /** seq of the LLM_REQUESTED event this completion belongs to. */
+  scheduledEventSeq: number;
+  requestHash: string;
+  text: string;
+  toolCalls: LlmToolCall[];
+  /** True if text/toolCalls were cut to the stored-size cap. */
+  truncated: boolean;
+  model: string;
+  tokensIn: number;
+  tokensOut: number;
+  latencyMs: number;
+  /** null when the model isn't in the price table. */
+  estimatedCostUsd: number | null;
+  /** Task attempt that produced this result. */
+  attempt: number;
+}
+
+export interface LlmFailedEvent {
+  type: 'LLM_FAILED';
+  stepId: string;
+  scheduledEventSeq: number;
+  error: string;
+  code: string;
+  retryable: boolean;
+  attempts: number;
+}
+
+export interface ToolRequestedEvent {
+  type: 'TOOL_REQUESTED';
+  /** Deterministic, derived from call position: `tool-0`, `tool-1`, ... */
+  stepId: string;
+  tool: string;
+  args: unknown;
+  /** sha256 of the canonical JSON of (tool, args). */
+  argsHash: string;
+  maxAttempts: number;
+}
+
+export interface ToolCompletedEvent {
+  type: 'TOOL_COMPLETED';
+  stepId: string;
+  /** seq of the TOOL_REQUESTED event this completion belongs to. */
+  scheduledEventSeq: number;
+  tool: string;
+  result: unknown;
+  latencyMs: number;
+  /** Task attempt that produced this result. */
+  attempt: number;
+}
+
+export interface ToolFailedEvent {
+  type: 'TOOL_FAILED';
+  stepId: string;
+  scheduledEventSeq: number;
+  tool: string;
+  error: string;
+  /** e.g. unknown_tool | invalid_args | tool_error */
+  code: string;
+  retryable: boolean;
+  attempts: number;
+}
+
 export type WorkflowEventPayload =
   | WorkflowStartedEvent
   | ActivityScheduledEvent
@@ -79,7 +167,13 @@ export type WorkflowEventPayload =
   | TimerFiredEvent
   | SignalReceivedEvent
   | CancellationRequestedEvent
-  | WorkflowCanceledEvent;
+  | WorkflowCanceledEvent
+  | LlmRequestedEvent
+  | LlmCompletedEvent
+  | LlmFailedEvent
+  | ToolRequestedEvent
+  | ToolCompletedEvent
+  | ToolFailedEvent;
 
 /**
  * An event as stored: `seq` is assigned by the event store at append
@@ -109,6 +203,34 @@ export interface TimerState {
   status: TimerStatus;
 }
 
+export type LlmCallStatus = 'REQUESTED' | 'COMPLETED' | 'FAILED';
+
+export interface LlmCallState {
+  stepId: string;
+  status: LlmCallStatus;
+  requestHash: string;
+  model?: string;
+  tokensIn?: number;
+  tokensOut?: number;
+  latencyMs?: number;
+  estimatedCostUsd?: number | null;
+  text?: string;
+  truncated?: boolean;
+  error?: string;
+}
+
+export type ToolCallStatus = 'REQUESTED' | 'COMPLETED' | 'FAILED';
+
+export interface ToolCallState {
+  stepId: string;
+  tool: string;
+  status: ToolCallStatus;
+  argsHash: string;
+  result?: unknown;
+  latencyMs?: number;
+  error?: string;
+}
+
 export type WorkflowStatus = 'RUNNING' | 'COMPLETED' | 'FAILED' | 'CANCELED';
 
 export interface WorkflowState {
@@ -119,6 +241,10 @@ export interface WorkflowState {
   activities: Record<number, ActivityState>;
   /** Keyed by the scheduling TimerScheduled event's seq. */
   timers: Record<number, TimerState>;
+  /** Keyed by the LLM_REQUESTED event's seq. */
+  llmCalls: Record<number, LlmCallState>;
+  /** Keyed by the TOOL_REQUESTED event's seq. */
+  toolCalls: Record<number, ToolCallState>;
   /** Payloads received so far, per signal name, in arrival order. */
   signals: Record<string, unknown[]>;
   result?: unknown;
@@ -129,6 +255,8 @@ export const initialState: WorkflowState = {
   status: 'RUNNING',
   activities: {},
   timers: {},
+  llmCalls: {},
+  toolCalls: {},
   signals: {},
 };
 
@@ -224,6 +352,96 @@ export function applyEvent(state: WorkflowState, stored: StoredWorkflowEvent): W
 
     case 'WorkflowCanceled':
       return { ...state, status: 'CANCELED', error: event.reason };
+
+    case 'LLM_REQUESTED':
+      return {
+        ...state,
+        llmCalls: {
+          ...state.llmCalls,
+          [stored.seq]: {
+            stepId: event.stepId,
+            status: 'REQUESTED',
+            requestHash: event.requestHash,
+          },
+        },
+      };
+
+    case 'LLM_COMPLETED': {
+      const existing = state.llmCalls[event.scheduledEventSeq];
+      if (!existing) return state;
+      return {
+        ...state,
+        llmCalls: {
+          ...state.llmCalls,
+          [event.scheduledEventSeq]: {
+            ...existing,
+            status: 'COMPLETED',
+            model: event.model,
+            tokensIn: event.tokensIn,
+            tokensOut: event.tokensOut,
+            latencyMs: event.latencyMs,
+            estimatedCostUsd: event.estimatedCostUsd,
+            text: event.text,
+            truncated: event.truncated,
+          },
+        },
+      };
+    }
+
+    case 'LLM_FAILED': {
+      const existing = state.llmCalls[event.scheduledEventSeq];
+      if (!existing) return state;
+      return {
+        ...state,
+        llmCalls: {
+          ...state.llmCalls,
+          [event.scheduledEventSeq]: { ...existing, status: 'FAILED', error: event.error },
+        },
+      };
+    }
+
+    case 'TOOL_REQUESTED':
+      return {
+        ...state,
+        toolCalls: {
+          ...state.toolCalls,
+          [stored.seq]: {
+            stepId: event.stepId,
+            tool: event.tool,
+            status: 'REQUESTED',
+            argsHash: event.argsHash,
+          },
+        },
+      };
+
+    case 'TOOL_COMPLETED': {
+      const existing = state.toolCalls[event.scheduledEventSeq];
+      if (!existing) return state;
+      return {
+        ...state,
+        toolCalls: {
+          ...state.toolCalls,
+          [event.scheduledEventSeq]: {
+            ...existing,
+            status: 'COMPLETED',
+            result: event.result,
+            latencyMs: event.latencyMs,
+          },
+        },
+      };
+    }
+
+    case 'TOOL_FAILED': {
+      const existing = state.toolCalls[event.scheduledEventSeq];
+      if (!existing) return state;
+      return {
+        ...state,
+        toolCalls: {
+          ...state.toolCalls,
+          [event.scheduledEventSeq]: { ...existing, status: 'FAILED', error: event.error },
+        },
+      };
+    }
 
     default: {
       // Exhaustiveness check: a new event variant added without a case

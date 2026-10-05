@@ -1,17 +1,8 @@
 import { useMemo, useState } from 'react';
 import { foldEvents, type StoredWorkflowEvent } from '@karyakram/core';
-import { DagView, type DagStep } from './DagView';
+import { DagView } from './DagView';
+import { describeStepEvent, replayedStepSeqs, toDagStep, type DagStep } from './llmView';
 import { useWorkflowEvents } from './useWorkflowEvents';
-
-function toDagStep(e: StoredWorkflowEvent): DagStep | null {
-  if (e.event.type === 'ActivityScheduled') {
-    return { seq: e.seq, kind: 'activity', label: e.event.activityType };
-  }
-  if (e.event.type === 'TimerScheduled') {
-    return { seq: e.seq, kind: 'timer', label: `timer (fires ${e.event.fireAt})` };
-  }
-  return null;
-}
 
 export function WorkflowDetail({ workflowId, onBack }: { workflowId: string; onBack: () => void }) {
   const events = useWorkflowEvents(workflowId);
@@ -27,6 +18,8 @@ export function WorkflowDetail({ workflowId, onBack }: { workflowId: string; onB
     () => events.map(toDagStep).filter((step): step is DagStep => step !== null),
     [events],
   );
+
+  const replayed = useMemo(() => replayedStepSeqs(visibleEvents), [visibleEvents]);
 
   const isLive = scrubberPos === null;
 
@@ -69,9 +62,44 @@ export function WorkflowDetail({ workflowId, onBack }: { workflowId: string; onB
           <li key={e.seq} className={e.seq <= effectivePos ? 'included' : 'excluded'}>
             {e.seq}. {e.event.type}
             {'activityType' in e.event ? ` (${e.event.activityType})` : ''}
+            <StepDetails event={e} replayed={replayed.has(e.seq)} />
           </li>
         ))}
       </ol>
     </div>
+  );
+}
+
+/** Prompt / response / tokens / latency for llm and tool events, with a "replayed" badge. */
+function StepDetails({ event, replayed }: { event: StoredWorkflowEvent; replayed: boolean }) {
+  const detail = describeStepEvent(event, replayed);
+  if (!detail) return null;
+  return (
+    <details className="step-details">
+      <summary>
+        {detail.title}
+        {detail.badges.map((b) => (
+          <span key={b} className={`badge badge-${b}`}>
+            {b}
+          </span>
+        ))}
+      </summary>
+      <table className="step-rows">
+        <tbody>
+          {detail.rows.map(([label, value]) => (
+            <tr key={label}>
+              <th>{label}</th>
+              <td>{value}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      {detail.blocks.map((b) => (
+        <div key={b.label}>
+          <div className="step-block-label">{b.label}</div>
+          <pre className="step-block">{b.text}</pre>
+        </div>
+      ))}
+    </details>
   );
 }

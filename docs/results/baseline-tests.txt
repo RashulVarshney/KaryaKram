@@ -1,0 +1,98 @@
+$ pnpm run test:unit && pnpm run test:integration
+$ vitest run --project unit
+
+ RUN  v4.1.10 /home/rashul/Downloads/VSCode/KaryaKram
+
+
+ Test Files  7 passed (7)
+      Tests  43 passed (43)
+   Start at  21:16:17
+   Duration  698ms (transform 829ms, setup 0ms, import 1.47s, tests 126ms, environment 2ms)
+
+$ vitest run --project integration
+
+ RUN  v4.1.10 /home/rashul/Downloads/VSCode/KaryaKram
+
+{"level":30,"time":1791215184978,"pid":27828,"hostname":"Rashul-pc","workerId":"activity-1","config":{"workerId":"activity-1","queue":"default","taskType":"activity","pollIntervalMs":20,"maxPollIntervalMs":2000,"leaseSeconds":10,"heartbeatIntervalMs":2000,"maxConcurrency":5,"drainTimeoutMs":30000},"msg":"worker starting"}
+{"level":30,"time":1791215184979,"pid":27828,"hostname":"Rashul-pc","workerId":"workflow-1","config":{"workerId":"workflow-1","queue":"default","taskType":"workflow","pollIntervalMs":20,"maxPollIntervalMs":2000,"leaseSeconds":10,"heartbeatIntervalMs":2000,"maxConcurrency":5,"drainTimeoutMs":30000},"msg":"worker starting"}
+{"level":30,"time":1791215185044,"pid":27828,"hostname":"Rashul-pc","workerId":"workflow-1","taskId":"1","msg":"task completed"}
+{"level":30,"time":1791215185066,"pid":27828,"hostname":"Rashul-pc","workerId":"activity-1","taskId":"2","msg":"task completed"}
+{"level":30,"time":1791215185112,"pid":27828,"hostname":"Rashul-pc","workerId":"workflow-1","taskId":"4","msg":"task completed"}
+{"level":30,"time":1791215185142,"pid":27828,"hostname":"Rashul-pc","workerId":"activity-1","taskId":"5","msg":"task completed"}
+{"level":30,"time":1791215185176,"pid":27828,"hostname":"Rashul-pc","workerId":"workflow-1","taskId":"7","msg":"task completed"}
+{"level":30,"time":1791215185206,"pid":27828,"hostname":"Rashul-pc","workerId":"activity-1","taskId":"8","msg":"task completed"}
+{"level":30,"time":1791215185233,"pid":27828,"hostname":"Rashul-pc","workerId":"workflow-1","taskId":"10","msg":"task completed"}
+{"level":30,"time":1791215185259,"pid":27828,"hostname":"Rashul-pc","workerId":"activity-1","msg":"worker stopping — draining in-flight tasks"}
+{"level":30,"time":1791215185260,"pid":27828,"hostname":"Rashul-pc","workerId":"workflow-1","msg":"worker stopping — draining in-flight tasks"}
+{"level":30,"time":1791215185260,"pid":27828,"hostname":"Rashul-pc","workerId":"activity-1","msg":"worker stopped"}
+{"level":30,"time":1791215185261,"pid":27828,"hostname":"Rashul-pc","workerId":"workflow-1","msg":"worker stopped"}
+{"level":30,"time":1791215186201,"pid":27822,"hostname":"Rashul-pc","component":"scheduler","leaderId":"replica-a","msg":"scheduler starting"}
+{"level":30,"time":1791215186203,"pid":27822,"hostname":"Rashul-pc","component":"scheduler","leaderId":"replica-b","msg":"scheduler starting"}
+{"level":30,"time":1791215186202,"pid":27822,"hostname":"Rashul-pc","component":"leader-election","leaderId":"replica-a","msg":"leader election starting"}
+{"level":30,"time":1791215186203,"pid":27822,"hostname":"Rashul-pc","component":"leader-election","leaderId":"replica-b","msg":"leader election starting"}
+{"level":30,"time":1791215186224,"pid":27822,"hostname":"Rashul-pc","component":"leader-election","leaderId":"replica-b","msg":"acquired leadership"}
+{"level":30,"time":1791215186231,"pid":27822,"hostname":"Rashul-pc","component":"reaper","intervalMs":50,"msg":"reaper starting"}
+{"level":30,"time":1791215186305,"pid":27822,"hostname":"Rashul-pc","component":"reaper","count":1,"taskIds":["1"],"msg":"reclaimed expired leases"}
+{"level":30,"time":1791215186693,"pid":27822,"hostname":"Rashul-pc","component":"leader-election","leaderId":"replica-a","msg":"leader election stopped"}
+{"level":30,"time":1791215186693,"pid":27822,"hostname":"Rashul-pc","component":"scheduler","leaderId":"replica-a","msg":"scheduler stopped"}
+{"level":30,"time":1791215186707,"pid":27822,"hostname":"Rashul-pc","component":"reaper","msg":"reaper stopped"}
+{"level":30,"time":1791215186708,"pid":27822,"hostname":"Rashul-pc","component":"leader-election","leaderId":"replica-b","msg":"leader election stopped"}
+{"level":30,"time":1791215186708,"pid":27822,"hostname":"Rashul-pc","component":"scheduler","leaderId":"replica-b","msg":"scheduler stopped"}
+{"level":30,"time":1791215186805,"pid":27822,"hostname":"Rashul-pc","component":"scheduler","leaderId":"replica-a","msg":"scheduler starting"}
+{"level":30,"time":1791215186806,"pid":27822,"hostname":"Rashul-pc","component":"scheduler","leaderId":"replica-b","msg":"scheduler starting"}
+{"level":30,"time":1791215186805,"pid":27822,"hostname":"Rashul-pc","component":"leader-election","leaderId":"replica-a","msg":"leader election starting"}
+{"level":30,"time":1791215186806,"pid":27822,"hostname":"Rashul-pc","component":"leader-election","leaderId":"replica-b","msg":"leader election starting"}
+{"level":30,"time":1791215186816,"pid":27822,"hostname":"Rashul-pc","component":"leader-election","leaderId":"replica-a","msg":"acquired leadership"}
+{"level":30,"time":1791215186818,"pid":27822,"hostname":"Rashul-pc","component":"reaper","intervalMs":50,"msg":"reaper starting"}
+{"level":30,"time":1791215186830,"pid":27822,"hostname":"Rashul-pc","component":"reaper","msg":"reaper stopped"}
+{"level":30,"time":1791215186838,"pid":27822,"hostname":"Rashul-pc","component":"leader-election","leaderId":"replica-a","msg":"leader election stopped"}
+{"level":30,"time":1791215186838,"pid":27822,"hostname":"Rashul-pc","component":"scheduler","leaderId":"replica-a","msg":"scheduler stopped"}
+{"level":30,"time":1791215186895,"pid":27822,"hostname":"Rashul-pc","component":"leader-election","leaderId":"replica-b","msg":"acquired leadership"}
+{"level":30,"time":1791215186896,"pid":27822,"hostname":"Rashul-pc","component":"reaper","intervalMs":50,"msg":"reaper starting"}
+{"level":30,"time":1791215186949,"pid":27822,"hostname":"Rashul-pc","component":"reaper","count":1,"taskIds":["1"],"msg":"reclaimed expired leases"}
+{"level":30,"time":1791215186966,"pid":27822,"hostname":"Rashul-pc","component":"leader-election","leaderId":"replica-a","msg":"leader election stopped"}
+{"level":30,"time":1791215186967,"pid":27822,"hostname":"Rashul-pc","component":"scheduler","leaderId":"replica-a","msg":"scheduler stopped"}
+{"level":30,"time":1791215186969,"pid":27822,"hostname":"Rashul-pc","component":"reaper","msg":"reaper stopped"}
+{"level":30,"time":1791215186969,"pid":27822,"hostname":"Rashul-pc","component":"leader-election","leaderId":"replica-b","msg":"leader election stopped"}
+{"level":30,"time":1791215186969,"pid":27822,"hostname":"Rashul-pc","component":"scheduler","leaderId":"replica-b","msg":"scheduler stopped"}
+{"level":30,"time":1791215193179,"pid":33068,"hostname":"Rashul-pc","workerId":"Rashul-pc-33068-76d9e6","config":{"workerId":"Rashul-pc-33068-76d9e6","queue":"default","pollIntervalMs":50,"maxPollIntervalMs":2000,"leaseSeconds":30,"heartbeatIntervalMs":10000,"maxConcurrency":1,"drainTimeoutMs":30000,"notifyConnectionString":"postgres://test:test@localhost:32780/test"},"msg":"worker starting"}
+{"level":30,"time":1791215193206,"pid":33068,"hostname":"Rashul-pc","workerId":"Rashul-pc-33068-76d9e6","msg":"listening for tasks_available notifications"}
+{"level":30,"time":1791215193727,"pid":33068,"hostname":"Rashul-pc","workerId":"Rashul-pc-33068-76d9e6","taskId":"1","msg":"task completed"}
+{"level":30,"time":1791215193730,"pid":33068,"hostname":"Rashul-pc","workerId":"Rashul-pc-33068-76d9e6","msg":"worker stopping — draining in-flight tasks"}
+{"level":30,"time":1791215193739,"pid":33068,"hostname":"Rashul-pc","workerId":"Rashul-pc-33068-76d9e6","msg":"worker stopped"}
+{"level":30,"time":1791215193854,"pid":33068,"hostname":"Rashul-pc","workerId":"Rashul-pc-33068-b26a30","config":{"workerId":"Rashul-pc-33068-b26a30","queue":"default","pollIntervalMs":20,"maxPollIntervalMs":200,"leaseSeconds":30,"heartbeatIntervalMs":10000,"maxConcurrency":1,"drainTimeoutMs":30000},"msg":"worker starting"}
+{"level":30,"time":1791215193981,"pid":33068,"hostname":"Rashul-pc","workerId":"Rashul-pc-33068-b26a30","taskId":"1","msg":"task completed"}
+{"level":30,"time":1791215193983,"pid":33068,"hostname":"Rashul-pc","workerId":"Rashul-pc-33068-b26a30","msg":"worker stopping — draining in-flight tasks"}
+{"level":30,"time":1791215193983,"pid":33068,"hostname":"Rashul-pc","workerId":"Rashul-pc-33068-b26a30","msg":"worker stopped"}
+{"level":30,"time":1791215194613,"pid":34249,"hostname":"Rashul-pc","workerId":"Rashul-pc-34249-7f3497","config":{"workerId":"Rashul-pc-34249-7f3497","queue":"default","pollIntervalMs":20,"maxPollIntervalMs":200,"leaseSeconds":30,"heartbeatIntervalMs":10000,"maxConcurrency":1,"drainTimeoutMs":30000},"msg":"worker starting"}
+{"level":30,"time":1791215194647,"pid":34249,"hostname":"Rashul-pc","workerId":"Rashul-pc-34249-7f3497","taskId":"1","msg":"task completed"}
+{"level":40,"time":1791215194672,"pid":34249,"hostname":"Rashul-pc","workerId":"Rashul-pc-34249-7f3497","taskId":"2","err":{"type":"Error","message":"forced failure for the metrics test","stack":"Error: forced failure for the metrics test\n    at Worker.__vite_ssr_import_7__.Worker.tracer.tracer [as handler] (/home/rashul/Downloads/VSCode/KaryaKram/packages/worker-sdk/test/metrics.integration.test.ts:67:36)\n    at /home/rashul/Downloads/VSCode/KaryaKram/packages/worker-sdk/src/worker.ts:149:84\n    at /home/rashul/Downloads/VSCode/KaryaKram/packages/observability/dist/tracing.js:62:26\n    at NoopContextManager.with (/home/rashul/Downloads/VSCode/KaryaKram/node_modules/.pnpm/@opentelemetry+api@1.9.1/node_modules/@opentelemetry/api/build/src/context/NoopContextManager.js:14:19)\n    at ContextAPI.with (/home/rashul/Downloads/VSCode/KaryaKram/node_modules/.pnpm/@opentelemetry+api@1.9.1/node_modules/@opentelemetry/api/build/src/api/context.js:51:46)\n    at NoopTracer.startActiveSpan (/home/rashul/Downloads/VSCode/KaryaKram/node_modules/.pnpm/@opentelemetry+api@1.9.1/node_modules/@opentelemetry/api/build/src/trace/NoopTracer.js:54:31)\n    at ProxyTracer.startActiveSpan (/home/rashul/Downloads/VSCode/KaryaKram/node_modules/.pnpm/@opentelemetry+api@1.9.1/node_modules/@opentelemetry/api/build/src/trace/ProxyTracer.js:27:24)\n    at /home/rashul/Downloads/VSCode/KaryaKram/packages/observability/dist/tracing.js:60:59\n    at NoopContextManager.with (/home/rashul/Downloads/VSCode/KaryaKram/node_modules/.pnpm/@opentelemetry+api@1.9.1/node_modules/@opentelemetry/api/build/src/context/NoopContextManager.js:14:19)\n    at ContextAPI.with (/home/rashul/Downloads/VSCode/KaryaKram/node_modules/.pnpm/@opentelemetry+api@1.9.1/node_modules/@opentelemetry/api/build/src/api/context.js:51:46)"},"msg":"task failed"}
+{"level":30,"time":1791215194776,"pid":34249,"hostname":"Rashul-pc","workerId":"Rashul-pc-34249-7f3497","msg":"worker stopping — draining in-flight tasks"}
+{"level":30,"time":1791215194776,"pid":34249,"hostname":"Rashul-pc","workerId":"Rashul-pc-34249-7f3497","msg":"worker stopped"}
+{"level":30,"time":1791215195517,"pid":35259,"hostname":"Rashul-pc","component":"leader-election","leaderId":"replica-a","msg":"leader election starting"}
+{"level":30,"time":1791215195523,"pid":35259,"hostname":"Rashul-pc","component":"leader-election","leaderId":"replica-b","msg":"leader election starting"}
+{"level":30,"time":1791215195556,"pid":35259,"hostname":"Rashul-pc","component":"leader-election","leaderId":"replica-b","msg":"acquired leadership"}
+{"level":30,"time":1791215195773,"pid":35259,"hostname":"Rashul-pc","component":"leader-election","leaderId":"replica-a","msg":"leader election stopped"}
+{"level":30,"time":1791215195777,"pid":35259,"hostname":"Rashul-pc","component":"leader-election","leaderId":"replica-b","msg":"leader election stopped"}
+{"level":30,"time":1791215195824,"pid":35259,"hostname":"Rashul-pc","component":"leader-election","leaderId":"replica-a","msg":"leader election starting"}
+{"level":30,"time":1791215195909,"pid":35259,"hostname":"Rashul-pc","component":"leader-election","leaderId":"replica-a","msg":"acquired leadership"}
+{"level":30,"time":1791215195945,"pid":35259,"hostname":"Rashul-pc","component":"leader-election","leaderId":"replica-a","msg":"leader election stopped"}
+{"level":30,"time":1791215196060,"pid":35259,"hostname":"Rashul-pc","component":"leader-election","leaderId":"replica-a","msg":"leader election starting"}
+{"level":30,"time":1791215196104,"pid":35259,"hostname":"Rashul-pc","component":"leader-election","leaderId":"replica-b","msg":"leader election starting"}
+{"level":30,"time":1791215196130,"pid":35259,"hostname":"Rashul-pc","component":"leader-election","leaderId":"replica-b","msg":"acquired leadership"}
+{"level":30,"time":1791215196279,"pid":35259,"hostname":"Rashul-pc","component":"leader-election","leaderId":"replica-b","msg":"leader election stopped"}
+{"level":30,"time":1791215196297,"pid":35259,"hostname":"Rashul-pc","component":"leader-election","leaderId":"replica-a","msg":"acquired leadership"}
+{"level":30,"time":1791215196305,"pid":35259,"hostname":"Rashul-pc","component":"leader-election","leaderId":"replica-b","msg":"leader election stopped"}
+{"level":30,"time":1791215196308,"pid":35259,"hostname":"Rashul-pc","component":"leader-election","leaderId":"replica-a","msg":"leader election stopped"}
+{"level":30,"time":1791215198107,"pid":38321,"hostname":"Rashul-pc","workerId":"workflow-1","config":{"workerId":"workflow-1","queue":"default","taskType":"workflow","pollIntervalMs":20,"maxPollIntervalMs":2000,"leaseSeconds":10,"heartbeatIntervalMs":2000,"maxConcurrency":5,"drainTimeoutMs":30000},"msg":"worker starting"}
+{"level":30,"time":1791215198121,"pid":38321,"hostname":"Rashul-pc","workerId":"workflow-1","taskId":"1","msg":"task completed"}
+{"level":30,"time":1791215198447,"pid":38321,"hostname":"Rashul-pc","workerId":"workflow-1","taskId":"2","msg":"task completed"}
+{"level":30,"time":1791215198450,"pid":38321,"hostname":"Rashul-pc","workerId":"workflow-1","msg":"worker stopping — draining in-flight tasks"}
+{"level":30,"time":1791215198450,"pid":38321,"hostname":"Rashul-pc","workerId":"workflow-1","msg":"worker stopped"}
+
+ Test Files  19 passed (19)
+      Tests  39 passed (39)
+   Start at  21:16:19
+   Duration  24.92s (transform 1.56s, setup 0ms, import 25.08s, tests 178.82s, environment 9ms)
+
+exit=0

@@ -122,3 +122,57 @@ button:disabled {
 .event-log .excluded {
   opacity: 0.35;
 }
+
+.step-details {
+  margin: 4px 0 8px;
+  font-size: 0.9em;
+}
+
+.step-details summary {
+  cursor: pointer;
+}
+
+.step-rows th {
+  text-align: left;
+  padding-right: 12px;
+  font-weight: 600;
+  color: #475569;
+}
+
+.step-block-label {
+  margin-top: 6px;
+  font-size: 0.8em;
+  text-transform: uppercase;
+  color: #64748b;
+}
+
+.step-block {
+  background: #f1f5f9;
+  padding: 8px;
+  border-radius: 6px;
+  white-space: pre-wrap;
+  max-height: 220px;
+  overflow: auto;
+}
+
+.badge {
+  margin-left: 8px;
+  padding: 1px 8px;
+  border-radius: 999px;
+  font-size: 0.75em;
+  background: #e2e8f0;
+}
+
+.badge-replayed {
+  background: #bfdbfe;
+}
+
+.badge-truncated,
+.badge-redacted,
+.badge-none {
+  background: #fde68a;
+}
+
+.badge-non-retryable {
+  background: #fecaca;
+}

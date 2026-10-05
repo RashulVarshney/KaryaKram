@@ -1,0 +1,1460 @@
+{
+  "startedAt": "2026-10-05T16:30:40.652Z",
+  "finishedAt": "2026-10-05T16:33:38.165Z",
+  "runs": 50,
+  "seed": 20260105,
+  "violations": 0,
+  "results": [
+    {
+      "run": 0,
+      "fault": "after_provider_before_persist",
+      "ticket": 0,
+      "crashed": true,
+      "workflowStatus": "COMPLETED",
+      "completedBeforeCrash": false,
+      "recoveryMs": 2292,
+      "outputMatchesReference": true,
+      "sideEffectCounts": {
+        "tool-0:customer_lookup": 1,
+        "tool-1:reply_sent": 1
+      },
+      "sideEffectsExactlyOnce": true,
+      "steps": [
+        {
+          "stepId": "llm-0",
+          "providerCalls": 2,
+          "window": "in_window"
+        },
+        {
+          "stepId": "llm-1",
+          "providerCalls": 1,
+          "window": "after_crash"
+        }
+      ],
+      "violations": []
+    },
+    {
+      "run": 1,
+      "fault": "after_persist",
+      "ticket": 1,
+      "crashed": true,
+      "workflowStatus": "COMPLETED",
+      "completedBeforeCrash": false,
+      "recoveryMs": 925,
+      "outputMatchesReference": true,
+      "sideEffectCounts": {
+        "tool-0:customer_lookup": 1,
+        "tool-1:reply_sent": 1
+      },
+      "sideEffectsExactlyOnce": true,
+      "steps": [
+        {
+          "stepId": "llm-0",
+          "providerCalls": 1,
+          "window": "persisted_before_crash"
+        },
+        {
+          "stepId": "llm-1",
+          "providerCalls": 1,
+          "window": "after_crash"
+        }
+      ],
+      "violations": []
+    },
+    {
+      "run": 2,
+      "fault": "before_tool_commit",
+      "ticket": 2,
+      "crashed": true,
+      "workflowStatus": "COMPLETED",
+      "completedBeforeCrash": false,
+      "recoveryMs": 3369,
+      "outputMatchesReference": true,
+      "sideEffectCounts": {
+        "tool-0:customer_lookup": 1,
+        "tool-1:reply_sent": 1
+      },
+      "sideEffectsExactlyOnce": true,
+      "steps": [
+        {
+          "stepId": "llm-0",
+          "providerCalls": 1,
+          "window": "persisted_before_crash"
+        },
+        {
+          "stepId": "llm-1",
+          "providerCalls": 1,
+          "window": "persisted_before_crash"
+        }
+      ],
+      "violations": []
+    },
+    {
+      "run": 3,
+      "fault": "random_delay",
+      "ticket": 3,
+      "crashed": true,
+      "workflowStatus": "COMPLETED",
+      "completedBeforeCrash": true,
+      "recoveryMs": null,
+      "outputMatchesReference": true,
+      "sideEffectCounts": {
+        "tool-0:customer_lookup": 1,
+        "tool-1:reply_sent": 1
+      },
+      "sideEffectsExactlyOnce": true,
+      "steps": [
+        {
+          "stepId": "llm-0",
+          "providerCalls": 1,
+          "window": "persisted_before_crash"
+        },
+        {
+          "stepId": "llm-1",
+          "providerCalls": 1,
+          "window": "persisted_before_crash"
+        }
+      ],
+      "violations": []
+    },
+    {
+      "run": 4,
+      "fault": "after_provider_before_persist",
+      "ticket": 4,
+      "crashed": true,
+      "workflowStatus": "COMPLETED",
+      "completedBeforeCrash": false,
+      "recoveryMs": 2318,
+      "outputMatchesReference": true,
+      "sideEffectCounts": {
+        "tool-0:customer_lookup": 1,
+        "tool-1:reply_sent": 1
+      },
+      "sideEffectsExactlyOnce": true,
+      "steps": [
+        {
+          "stepId": "llm-0",
+          "providerCalls": 2,
+          "window": "in_window"
+        },
+        {
+          "stepId": "llm-1",
+          "providerCalls": 1,
+          "window": "after_crash"
+        }
+      ],
+      "violations": []
+    },
+    {
+      "run": 5,
+      "fault": "after_persist",
+      "ticket": 5,
+      "crashed": true,
+      "workflowStatus": "COMPLETED",
+      "completedBeforeCrash": false,
+      "recoveryMs": 1050,
+      "outputMatchesReference": true,
+      "sideEffectCounts": {
+        "tool-0:customer_lookup": 1,
+        "tool-1:reply_sent": 1
+      },
+      "sideEffectsExactlyOnce": true,
+      "steps": [
+        {
+          "stepId": "llm-0",
+          "providerCalls": 1,
+          "window": "persisted_before_crash"
+        },
+        {
+          "stepId": "llm-1",
+          "providerCalls": 1,
+          "window": "after_crash"
+        }
+      ],
+      "violations": []
+    },
+    {
+      "run": 6,
+      "fault": "before_tool_commit",
+      "ticket": 6,
+      "crashed": true,
+      "workflowStatus": "COMPLETED",
+      "completedBeforeCrash": false,
+      "recoveryMs": 3469,
+      "outputMatchesReference": true,
+      "sideEffectCounts": {
+        "tool-0:customer_lookup": 1,
+        "tool-1:reply_sent": 1
+      },
+      "sideEffectsExactlyOnce": true,
+      "steps": [
+        {
+          "stepId": "llm-0",
+          "providerCalls": 1,
+          "window": "persisted_before_crash"
+        },
+        {
+          "stepId": "llm-1",
+          "providerCalls": 1,
+          "window": "after_crash"
+        }
+      ],
+      "violations": []
+    },
+    {
+      "run": 7,
+      "fault": "random_delay",
+      "ticket": 7,
+      "crashed": true,
+      "workflowStatus": "COMPLETED",
+      "completedBeforeCrash": false,
+      "recoveryMs": 3589,
+      "outputMatchesReference": true,
+      "sideEffectCounts": {
+        "tool-0:customer_lookup": 1,
+        "tool-1:reply_sent": 1
+      },
+      "sideEffectsExactlyOnce": true,
+      "steps": [
+        {
+          "stepId": "llm-0",
+          "providerCalls": 2,
+          "window": "in_window"
+        },
+        {
+          "stepId": "llm-1",
+          "providerCalls": 1,
+          "window": "after_crash"
+        }
+      ],
+      "violations": []
+    },
+    {
+      "run": 8,
+      "fault": "after_provider_before_persist",
+      "ticket": 0,
+      "crashed": true,
+      "workflowStatus": "COMPLETED",
+      "completedBeforeCrash": false,
+      "recoveryMs": 2277,
+      "outputMatchesReference": true,
+      "sideEffectCounts": {
+        "tool-0:customer_lookup": 1,
+        "tool-1:reply_sent": 1
+      },
+      "sideEffectsExactlyOnce": true,
+      "steps": [
+        {
+          "stepId": "llm-0",
+          "providerCalls": 2,
+          "window": "in_window"
+        },
+        {
+          "stepId": "llm-1",
+          "providerCalls": 1,
+          "window": "after_crash"
+        }
+      ],
+      "violations": []
+    },
+    {
+      "run": 9,
+      "fault": "after_persist",
+      "ticket": 1,
+      "crashed": true,
+      "workflowStatus": "COMPLETED",
+      "completedBeforeCrash": false,
+      "recoveryMs": 966,
+      "outputMatchesReference": true,
+      "sideEffectCounts": {
+        "tool-0:customer_lookup": 1,
+        "tool-1:reply_sent": 1
+      },
+      "sideEffectsExactlyOnce": true,
+      "steps": [
+        {
+          "stepId": "llm-0",
+          "providerCalls": 1,
+          "window": "persisted_before_crash"
+        },
+        {
+          "stepId": "llm-1",
+          "providerCalls": 1,
+          "window": "after_crash"
+        }
+      ],
+      "violations": []
+    },
+    {
+      "run": 10,
+      "fault": "before_tool_commit",
+      "ticket": 2,
+      "crashed": true,
+      "workflowStatus": "COMPLETED",
+      "completedBeforeCrash": false,
+      "recoveryMs": 3353,
+      "outputMatchesReference": true,
+      "sideEffectCounts": {
+        "tool-0:customer_lookup": 1,
+        "tool-1:reply_sent": 1
+      },
+      "sideEffectsExactlyOnce": true,
+      "steps": [
+        {
+          "stepId": "llm-0",
+          "providerCalls": 1,
+          "window": "persisted_before_crash"
+        },
+        {
+          "stepId": "llm-1",
+          "providerCalls": 1,
+          "window": "persisted_before_crash"
+        }
+      ],
+      "violations": []
+    },
+    {
+      "run": 11,
+      "fault": "random_delay",
+      "ticket": 3,
+      "crashed": true,
+      "workflowStatus": "COMPLETED",
+      "completedBeforeCrash": true,
+      "recoveryMs": null,
+      "outputMatchesReference": true,
+      "sideEffectCounts": {
+        "tool-0:customer_lookup": 1,
+        "tool-1:reply_sent": 1
+      },
+      "sideEffectsExactlyOnce": true,
+      "steps": [
+        {
+          "stepId": "llm-0",
+          "providerCalls": 1,
+          "window": "persisted_before_crash"
+        },
+        {
+          "stepId": "llm-1",
+          "providerCalls": 1,
+          "window": "persisted_before_crash"
+        }
+      ],
+      "violations": []
+    },
+    {
+      "run": 12,
+      "fault": "after_provider_before_persist",
+      "ticket": 4,
+      "crashed": true,
+      "workflowStatus": "COMPLETED",
+      "completedBeforeCrash": false,
+      "recoveryMs": 2317,
+      "outputMatchesReference": true,
+      "sideEffectCounts": {
+        "tool-0:customer_lookup": 1,
+        "tool-1:reply_sent": 1
+      },
+      "sideEffectsExactlyOnce": true,
+      "steps": [
+        {
+          "stepId": "llm-0",
+          "providerCalls": 2,
+          "window": "in_window"
+        },
+        {
+          "stepId": "llm-1",
+          "providerCalls": 1,
+          "window": "after_crash"
+        }
+      ],
+      "violations": []
+    },
+    {
+      "run": 13,
+      "fault": "after_persist",
+      "ticket": 5,
+      "crashed": true,
+      "workflowStatus": "COMPLETED",
+      "completedBeforeCrash": false,
+      "recoveryMs": 918,
+      "outputMatchesReference": true,
+      "sideEffectCounts": {
+        "tool-0:customer_lookup": 1,
+        "tool-1:reply_sent": 1
+      },
+      "sideEffectsExactlyOnce": true,
+      "steps": [
+        {
+          "stepId": "llm-0",
+          "providerCalls": 1,
+          "window": "persisted_before_crash"
+        },
+        {
+          "stepId": "llm-1",
+          "providerCalls": 1,
+          "window": "after_crash"
+        }
+      ],
+      "violations": []
+    },
+    {
+      "run": 14,
+      "fault": "before_tool_commit",
+      "ticket": 6,
+      "crashed": true,
+      "workflowStatus": "COMPLETED",
+      "completedBeforeCrash": false,
+      "recoveryMs": 2235,
+      "outputMatchesReference": true,
+      "sideEffectCounts": {
+        "tool-0:customer_lookup": 1,
+        "tool-1:reply_sent": 1
+      },
+      "sideEffectsExactlyOnce": true,
+      "steps": [
+        {
+          "stepId": "llm-0",
+          "providerCalls": 1,
+          "window": "persisted_before_crash"
+        },
+        {
+          "stepId": "llm-1",
+          "providerCalls": 1,
+          "window": "after_crash"
+        }
+      ],
+      "violations": []
+    },
+    {
+      "run": 15,
+      "fault": "random_delay",
+      "ticket": 7,
+      "crashed": true,
+      "workflowStatus": "COMPLETED",
+      "completedBeforeCrash": true,
+      "recoveryMs": null,
+      "outputMatchesReference": true,
+      "sideEffectCounts": {
+        "tool-0:customer_lookup": 1,
+        "tool-1:reply_sent": 1
+      },
+      "sideEffectsExactlyOnce": true,
+      "steps": [
+        {
+          "stepId": "llm-0",
+          "providerCalls": 1,
+          "window": "persisted_before_crash"
+        },
+        {
+          "stepId": "llm-1",
+          "providerCalls": 1,
+          "window": "persisted_before_crash"
+        }
+      ],
+      "violations": []
+    },
+    {
+      "run": 16,
+      "fault": "after_provider_before_persist",
+      "ticket": 0,
+      "crashed": true,
+      "workflowStatus": "COMPLETED",
+      "completedBeforeCrash": false,
+      "recoveryMs": 2156,
+      "outputMatchesReference": true,
+      "sideEffectCounts": {
+        "tool-0:customer_lookup": 1,
+        "tool-1:reply_sent": 1
+      },
+      "sideEffectsExactlyOnce": true,
+      "steps": [
+        {
+          "stepId": "llm-0",
+          "providerCalls": 1,
+          "window": "persisted_before_crash"
+        },
+        {
+          "stepId": "llm-1",
+          "providerCalls": 2,
+          "window": "in_window"
+        }
+      ],
+      "violations": []
+    },
+    {
+      "run": 17,
+      "fault": "after_persist",
+      "ticket": 1,
+      "crashed": true,
+      "workflowStatus": "COMPLETED",
+      "completedBeforeCrash": false,
+      "recoveryMs": 965,
+      "outputMatchesReference": true,
+      "sideEffectCounts": {
+        "tool-0:customer_lookup": 1,
+        "tool-1:reply_sent": 1
+      },
+      "sideEffectsExactlyOnce": true,
+      "steps": [
+        {
+          "stepId": "llm-0",
+          "providerCalls": 1,
+          "window": "persisted_before_crash"
+        },
+        {
+          "stepId": "llm-1",
+          "providerCalls": 1,
+          "window": "after_crash"
+        }
+      ],
+      "violations": []
+    },
+    {
+      "run": 18,
+      "fault": "before_tool_commit",
+      "ticket": 2,
+      "crashed": true,
+      "workflowStatus": "COMPLETED",
+      "completedBeforeCrash": false,
+      "recoveryMs": 3332,
+      "outputMatchesReference": true,
+      "sideEffectCounts": {
+        "tool-0:customer_lookup": 1,
+        "tool-1:reply_sent": 1
+      },
+      "sideEffectsExactlyOnce": true,
+      "steps": [
+        {
+          "stepId": "llm-0",
+          "providerCalls": 1,
+          "window": "persisted_before_crash"
+        },
+        {
+          "stepId": "llm-1",
+          "providerCalls": 1,
+          "window": "persisted_before_crash"
+        }
+      ],
+      "violations": []
+    },
+    {
+      "run": 19,
+      "fault": "random_delay",
+      "ticket": 3,
+      "crashed": true,
+      "workflowStatus": "COMPLETED",
+      "completedBeforeCrash": false,
+      "recoveryMs": 3422,
+      "outputMatchesReference": true,
+      "sideEffectCounts": {
+        "tool-1:reply_sent": 1,
+        "tool-0:customer_lookup": 1
+      },
+      "sideEffectsExactlyOnce": true,
+      "steps": [
+        {
+          "stepId": "llm-0",
+          "providerCalls": 1,
+          "window": "persisted_before_crash"
+        },
+        {
+          "stepId": "llm-1",
+          "providerCalls": 1,
+          "window": "after_crash"
+        }
+      ],
+      "violations": []
+    },
+    {
+      "run": 20,
+      "fault": "after_provider_before_persist",
+      "ticket": 4,
+      "crashed": true,
+      "workflowStatus": "COMPLETED",
+      "completedBeforeCrash": false,
+      "recoveryMs": 2277,
+      "outputMatchesReference": true,
+      "sideEffectCounts": {
+        "tool-0:customer_lookup": 1,
+        "tool-1:reply_sent": 1
+      },
+      "sideEffectsExactlyOnce": true,
+      "steps": [
+        {
+          "stepId": "llm-0",
+          "providerCalls": 2,
+          "window": "in_window"
+        },
+        {
+          "stepId": "llm-1",
+          "providerCalls": 1,
+          "window": "after_crash"
+        }
+      ],
+      "violations": []
+    },
+    {
+      "run": 21,
+      "fault": "after_persist",
+      "ticket": 5,
+      "crashed": true,
+      "workflowStatus": "COMPLETED",
+      "completedBeforeCrash": false,
+      "recoveryMs": 922,
+      "outputMatchesReference": true,
+      "sideEffectCounts": {
+        "tool-0:customer_lookup": 1,
+        "tool-1:reply_sent": 1
+      },
+      "sideEffectsExactlyOnce": true,
+      "steps": [
+        {
+          "stepId": "llm-0",
+          "providerCalls": 1,
+          "window": "persisted_before_crash"
+        },
+        {
+          "stepId": "llm-1",
+          "providerCalls": 1,
+          "window": "after_crash"
+        }
+      ],
+      "violations": []
+    },
+    {
+      "run": 22,
+      "fault": "before_tool_commit",
+      "ticket": 6,
+      "crashed": true,
+      "workflowStatus": "COMPLETED",
+      "completedBeforeCrash": false,
+      "recoveryMs": 3476,
+      "outputMatchesReference": true,
+      "sideEffectCounts": {
+        "tool-0:customer_lookup": 1,
+        "tool-1:reply_sent": 1
+      },
+      "sideEffectsExactlyOnce": true,
+      "steps": [
+        {
+          "stepId": "llm-0",
+          "providerCalls": 1,
+          "window": "persisted_before_crash"
+        },
+        {
+          "stepId": "llm-1",
+          "providerCalls": 1,
+          "window": "after_crash"
+        }
+      ],
+      "violations": []
+    },
+    {
+      "run": 23,
+      "fault": "random_delay",
+      "ticket": 7,
+      "crashed": true,
+      "workflowStatus": "COMPLETED",
+      "completedBeforeCrash": false,
+      "recoveryMs": 3580,
+      "outputMatchesReference": true,
+      "sideEffectCounts": {
+        "tool-0:customer_lookup": 1,
+        "tool-1:reply_sent": 1
+      },
+      "sideEffectsExactlyOnce": true,
+      "steps": [
+        {
+          "stepId": "llm-0",
+          "providerCalls": 1,
+          "window": "after_crash"
+        },
+        {
+          "stepId": "llm-1",
+          "providerCalls": 1,
+          "window": "after_crash"
+        }
+      ],
+      "violations": []
+    },
+    {
+      "run": 24,
+      "fault": "after_provider_before_persist",
+      "ticket": 0,
+      "crashed": true,
+      "workflowStatus": "COMPLETED",
+      "completedBeforeCrash": false,
+      "recoveryMs": 3536,
+      "outputMatchesReference": true,
+      "sideEffectCounts": {
+        "tool-0:customer_lookup": 1,
+        "tool-1:reply_sent": 1
+      },
+      "sideEffectsExactlyOnce": true,
+      "steps": [
+        {
+          "stepId": "llm-0",
+          "providerCalls": 2,
+          "window": "in_window"
+        },
+        {
+          "stepId": "llm-1",
+          "providerCalls": 1,
+          "window": "after_crash"
+        }
+      ],
+      "violations": []
+    },
+    {
+      "run": 25,
+      "fault": "after_persist",
+      "ticket": 1,
+      "crashed": true,
+      "workflowStatus": "COMPLETED",
+      "completedBeforeCrash": false,
+      "recoveryMs": 1002,
+      "outputMatchesReference": true,
+      "sideEffectCounts": {
+        "tool-0:customer_lookup": 1,
+        "tool-1:reply_sent": 1
+      },
+      "sideEffectsExactlyOnce": true,
+      "steps": [
+        {
+          "stepId": "llm-0",
+          "providerCalls": 1,
+          "window": "persisted_before_crash"
+        },
+        {
+          "stepId": "llm-1",
+          "providerCalls": 1,
+          "window": "after_crash"
+        }
+      ],
+      "violations": []
+    },
+    {
+      "run": 26,
+      "fault": "before_tool_commit",
+      "ticket": 2,
+      "crashed": true,
+      "workflowStatus": "COMPLETED",
+      "completedBeforeCrash": false,
+      "recoveryMs": 3377,
+      "outputMatchesReference": true,
+      "sideEffectCounts": {
+        "tool-0:customer_lookup": 1,
+        "tool-1:reply_sent": 1
+      },
+      "sideEffectsExactlyOnce": true,
+      "steps": [
+        {
+          "stepId": "llm-0",
+          "providerCalls": 1,
+          "window": "persisted_before_crash"
+        },
+        {
+          "stepId": "llm-1",
+          "providerCalls": 1,
+          "window": "persisted_before_crash"
+        }
+      ],
+      "violations": []
+    },
+    {
+      "run": 27,
+      "fault": "random_delay",
+      "ticket": 3,
+      "crashed": true,
+      "workflowStatus": "COMPLETED",
+      "completedBeforeCrash": false,
+      "recoveryMs": 3528,
+      "outputMatchesReference": true,
+      "sideEffectCounts": {
+        "tool-0:customer_lookup": 1,
+        "tool-1:reply_sent": 1
+      },
+      "sideEffectsExactlyOnce": true,
+      "steps": [
+        {
+          "stepId": "llm-0",
+          "providerCalls": 1,
+          "window": "persisted_before_crash"
+        },
+        {
+          "stepId": "llm-1",
+          "providerCalls": 1,
+          "window": "after_crash"
+        }
+      ],
+      "violations": []
+    },
+    {
+      "run": 28,
+      "fault": "after_provider_before_persist",
+      "ticket": 4,
+      "crashed": true,
+      "workflowStatus": "COMPLETED",
+      "completedBeforeCrash": false,
+      "recoveryMs": 3422,
+      "outputMatchesReference": true,
+      "sideEffectCounts": {
+        "tool-0:customer_lookup": 1,
+        "tool-1:reply_sent": 1
+      },
+      "sideEffectsExactlyOnce": true,
+      "steps": [
+        {
+          "stepId": "llm-0",
+          "providerCalls": 1,
+          "window": "persisted_before_crash"
+        },
+        {
+          "stepId": "llm-1",
+          "providerCalls": 2,
+          "window": "in_window"
+        }
+      ],
+      "violations": []
+    },
+    {
+      "run": 29,
+      "fault": "after_persist",
+      "ticket": 5,
+      "crashed": true,
+      "workflowStatus": "COMPLETED",
+      "completedBeforeCrash": false,
+      "recoveryMs": 916,
+      "outputMatchesReference": true,
+      "sideEffectCounts": {
+        "tool-0:customer_lookup": 1,
+        "tool-1:reply_sent": 1
+      },
+      "sideEffectsExactlyOnce": true,
+      "steps": [
+        {
+          "stepId": "llm-0",
+          "providerCalls": 1,
+          "window": "persisted_before_crash"
+        },
+        {
+          "stepId": "llm-1",
+          "providerCalls": 1,
+          "window": "after_crash"
+        }
+      ],
+      "violations": []
+    },
+    {
+      "run": 30,
+      "fault": "before_tool_commit",
+      "ticket": 6,
+      "crashed": true,
+      "workflowStatus": "COMPLETED",
+      "completedBeforeCrash": false,
+      "recoveryMs": 2228,
+      "outputMatchesReference": true,
+      "sideEffectCounts": {
+        "tool-0:customer_lookup": 1,
+        "tool-1:reply_sent": 1
+      },
+      "sideEffectsExactlyOnce": true,
+      "steps": [
+        {
+          "stepId": "llm-0",
+          "providerCalls": 1,
+          "window": "persisted_before_crash"
+        },
+        {
+          "stepId": "llm-1",
+          "providerCalls": 1,
+          "window": "after_crash"
+        }
+      ],
+      "violations": []
+    },
+    {
+      "run": 31,
+      "fault": "random_delay",
+      "ticket": 7,
+      "crashed": true,
+      "workflowStatus": "COMPLETED",
+      "completedBeforeCrash": true,
+      "recoveryMs": null,
+      "outputMatchesReference": true,
+      "sideEffectCounts": {
+        "tool-0:customer_lookup": 1,
+        "tool-1:reply_sent": 1
+      },
+      "sideEffectsExactlyOnce": true,
+      "steps": [
+        {
+          "stepId": "llm-0",
+          "providerCalls": 1,
+          "window": "persisted_before_crash"
+        },
+        {
+          "stepId": "llm-1",
+          "providerCalls": 1,
+          "window": "persisted_before_crash"
+        }
+      ],
+      "violations": []
+    },
+    {
+      "run": 32,
+      "fault": "after_provider_before_persist",
+      "ticket": 0,
+      "crashed": true,
+      "workflowStatus": "COMPLETED",
+      "completedBeforeCrash": false,
+      "recoveryMs": 3558,
+      "outputMatchesReference": true,
+      "sideEffectCounts": {
+        "tool-0:customer_lookup": 1,
+        "tool-1:reply_sent": 1
+      },
+      "sideEffectsExactlyOnce": true,
+      "steps": [
+        {
+          "stepId": "llm-0",
+          "providerCalls": 2,
+          "window": "in_window"
+        },
+        {
+          "stepId": "llm-1",
+          "providerCalls": 1,
+          "window": "after_crash"
+        }
+      ],
+      "violations": []
+    },
+    {
+      "run": 33,
+      "fault": "after_persist",
+      "ticket": 1,
+      "crashed": true,
+      "workflowStatus": "COMPLETED",
+      "completedBeforeCrash": false,
+      "recoveryMs": 960,
+      "outputMatchesReference": true,
+      "sideEffectCounts": {
+        "tool-0:customer_lookup": 1,
+        "tool-1:reply_sent": 1
+      },
+      "sideEffectsExactlyOnce": true,
+      "steps": [
+        {
+          "stepId": "llm-0",
+          "providerCalls": 1,
+          "window": "persisted_before_crash"
+        },
+        {
+          "stepId": "llm-1",
+          "providerCalls": 1,
+          "window": "after_crash"
+        }
+      ],
+      "violations": []
+    },
+    {
+      "run": 34,
+      "fault": "before_tool_commit",
+      "ticket": 2,
+      "crashed": true,
+      "workflowStatus": "COMPLETED",
+      "completedBeforeCrash": false,
+      "recoveryMs": 2100,
+      "outputMatchesReference": true,
+      "sideEffectCounts": {
+        "tool-0:customer_lookup": 1,
+        "tool-1:reply_sent": 1
+      },
+      "sideEffectsExactlyOnce": true,
+      "steps": [
+        {
+          "stepId": "llm-0",
+          "providerCalls": 1,
+          "window": "persisted_before_crash"
+        },
+        {
+          "stepId": "llm-1",
+          "providerCalls": 1,
+          "window": "persisted_before_crash"
+        }
+      ],
+      "violations": []
+    },
+    {
+      "run": 35,
+      "fault": "random_delay",
+      "ticket": 3,
+      "crashed": true,
+      "workflowStatus": "COMPLETED",
+      "completedBeforeCrash": false,
+      "recoveryMs": 2101,
+      "outputMatchesReference": true,
+      "sideEffectCounts": {
+        "tool-0:customer_lookup": 1,
+        "tool-1:reply_sent": 1
+      },
+      "sideEffectsExactlyOnce": true,
+      "steps": [
+        {
+          "stepId": "llm-0",
+          "providerCalls": 1,
+          "window": "persisted_before_crash"
+        },
+        {
+          "stepId": "llm-1",
+          "providerCalls": 1,
+          "window": "persisted_before_crash"
+        }
+      ],
+      "violations": []
+    },
+    {
+      "run": 36,
+      "fault": "after_provider_before_persist",
+      "ticket": 4,
+      "crashed": true,
+      "workflowStatus": "COMPLETED",
+      "completedBeforeCrash": false,
+      "recoveryMs": 3484,
+      "outputMatchesReference": true,
+      "sideEffectCounts": {
+        "tool-0:customer_lookup": 1,
+        "tool-1:reply_sent": 1
+      },
+      "sideEffectsExactlyOnce": true,
+      "steps": [
+        {
+          "stepId": "llm-0",
+          "providerCalls": 1,
+          "window": "persisted_before_crash"
+        },
+        {
+          "stepId": "llm-1",
+          "providerCalls": 2,
+          "window": "in_window"
+        }
+      ],
+      "violations": []
+    },
+    {
+      "run": 37,
+      "fault": "after_persist",
+      "ticket": 5,
+      "crashed": true,
+      "workflowStatus": "COMPLETED",
+      "completedBeforeCrash": false,
+      "recoveryMs": 999,
+      "outputMatchesReference": true,
+      "sideEffectCounts": {
+        "tool-0:customer_lookup": 1,
+        "tool-1:reply_sent": 1
+      },
+      "sideEffectsExactlyOnce": true,
+      "steps": [
+        {
+          "stepId": "llm-0",
+          "providerCalls": 1,
+          "window": "persisted_before_crash"
+        },
+        {
+          "stepId": "llm-1",
+          "providerCalls": 1,
+          "window": "after_crash"
+        }
+      ],
+      "violations": []
+    },
+    {
+      "run": 38,
+      "fault": "before_tool_commit",
+      "ticket": 6,
+      "crashed": true,
+      "workflowStatus": "COMPLETED",
+      "completedBeforeCrash": false,
+      "recoveryMs": 3334,
+      "outputMatchesReference": true,
+      "sideEffectCounts": {
+        "tool-0:customer_lookup": 1,
+        "tool-1:reply_sent": 1
+      },
+      "sideEffectsExactlyOnce": true,
+      "steps": [
+        {
+          "stepId": "llm-0",
+          "providerCalls": 1,
+          "window": "persisted_before_crash"
+        },
+        {
+          "stepId": "llm-1",
+          "providerCalls": 1,
+          "window": "persisted_before_crash"
+        }
+      ],
+      "violations": []
+    },
+    {
+      "run": 39,
+      "fault": "random_delay",
+      "ticket": 7,
+      "crashed": true,
+      "workflowStatus": "COMPLETED",
+      "completedBeforeCrash": true,
+      "recoveryMs": null,
+      "outputMatchesReference": true,
+      "sideEffectCounts": {
+        "tool-0:customer_lookup": 1,
+        "tool-1:reply_sent": 1
+      },
+      "sideEffectsExactlyOnce": true,
+      "steps": [
+        {
+          "stepId": "llm-0",
+          "providerCalls": 1,
+          "window": "persisted_before_crash"
+        },
+        {
+          "stepId": "llm-1",
+          "providerCalls": 1,
+          "window": "persisted_before_crash"
+        }
+      ],
+      "violations": []
+    },
+    {
+      "run": 40,
+      "fault": "after_provider_before_persist",
+      "ticket": 0,
+      "crashed": true,
+      "workflowStatus": "COMPLETED",
+      "completedBeforeCrash": false,
+      "recoveryMs": 3424,
+      "outputMatchesReference": true,
+      "sideEffectCounts": {
+        "tool-0:customer_lookup": 1,
+        "tool-1:reply_sent": 1
+      },
+      "sideEffectsExactlyOnce": true,
+      "steps": [
+        {
+          "stepId": "llm-0",
+          "providerCalls": 1,
+          "window": "persisted_before_crash"
+        },
+        {
+          "stepId": "llm-1",
+          "providerCalls": 2,
+          "window": "in_window"
+        }
+      ],
+      "violations": []
+    },
+    {
+      "run": 41,
+      "fault": "after_persist",
+      "ticket": 1,
+      "crashed": true,
+      "workflowStatus": "COMPLETED",
+      "completedBeforeCrash": false,
+      "recoveryMs": 958,
+      "outputMatchesReference": true,
+      "sideEffectCounts": {
+        "tool-0:customer_lookup": 1,
+        "tool-1:reply_sent": 1
+      },
+      "sideEffectsExactlyOnce": true,
+      "steps": [
+        {
+          "stepId": "llm-0",
+          "providerCalls": 1,
+          "window": "persisted_before_crash"
+        },
+        {
+          "stepId": "llm-1",
+          "providerCalls": 1,
+          "window": "after_crash"
+        }
+      ],
+      "violations": []
+    },
+    {
+      "run": 42,
+      "fault": "before_tool_commit",
+      "ticket": 2,
+      "crashed": true,
+      "workflowStatus": "COMPLETED",
+      "completedBeforeCrash": false,
+      "recoveryMs": 2220,
+      "outputMatchesReference": true,
+      "sideEffectCounts": {
+        "tool-0:customer_lookup": 1,
+        "tool-1:reply_sent": 1
+      },
+      "sideEffectsExactlyOnce": true,
+      "steps": [
+        {
+          "stepId": "llm-0",
+          "providerCalls": 1,
+          "window": "persisted_before_crash"
+        },
+        {
+          "stepId": "llm-1",
+          "providerCalls": 1,
+          "window": "after_crash"
+        }
+      ],
+      "violations": []
+    },
+    {
+      "run": 43,
+      "fault": "random_delay",
+      "ticket": 3,
+      "crashed": true,
+      "workflowStatus": "COMPLETED",
+      "completedBeforeCrash": false,
+      "recoveryMs": 3408,
+      "outputMatchesReference": true,
+      "sideEffectCounts": {
+        "tool-0:customer_lookup": 1,
+        "tool-1:reply_sent": 1
+      },
+      "sideEffectsExactlyOnce": true,
+      "steps": [
+        {
+          "stepId": "llm-0",
+          "providerCalls": 1,
+          "window": "persisted_before_crash"
+        },
+        {
+          "stepId": "llm-1",
+          "providerCalls": 2,
+          "window": "in_window"
+        }
+      ],
+      "violations": []
+    },
+    {
+      "run": 44,
+      "fault": "after_provider_before_persist",
+      "ticket": 4,
+      "crashed": true,
+      "workflowStatus": "COMPLETED",
+      "completedBeforeCrash": false,
+      "recoveryMs": 3571,
+      "outputMatchesReference": true,
+      "sideEffectCounts": {
+        "tool-0:customer_lookup": 1,
+        "tool-1:reply_sent": 1
+      },
+      "sideEffectsExactlyOnce": true,
+      "steps": [
+        {
+          "stepId": "llm-0",
+          "providerCalls": 2,
+          "window": "in_window"
+        },
+        {
+          "stepId": "llm-1",
+          "providerCalls": 1,
+          "window": "after_crash"
+        }
+      ],
+      "violations": []
+    },
+    {
+      "run": 45,
+      "fault": "after_persist",
+      "ticket": 5,
+      "crashed": true,
+      "workflowStatus": "COMPLETED",
+      "completedBeforeCrash": false,
+      "recoveryMs": 918,
+      "outputMatchesReference": true,
+      "sideEffectCounts": {
+        "tool-0:customer_lookup": 1,
+        "tool-1:reply_sent": 1
+      },
+      "sideEffectsExactlyOnce": true,
+      "steps": [
+        {
+          "stepId": "llm-0",
+          "providerCalls": 1,
+          "window": "persisted_before_crash"
+        },
+        {
+          "stepId": "llm-1",
+          "providerCalls": 1,
+          "window": "after_crash"
+        }
+      ],
+      "violations": []
+    },
+    {
+      "run": 46,
+      "fault": "before_tool_commit",
+      "ticket": 6,
+      "crashed": true,
+      "workflowStatus": "COMPLETED",
+      "completedBeforeCrash": false,
+      "recoveryMs": 2108,
+      "outputMatchesReference": true,
+      "sideEffectCounts": {
+        "tool-0:customer_lookup": 1,
+        "tool-1:reply_sent": 1
+      },
+      "sideEffectsExactlyOnce": true,
+      "steps": [
+        {
+          "stepId": "llm-0",
+          "providerCalls": 1,
+          "window": "persisted_before_crash"
+        },
+        {
+          "stepId": "llm-1",
+          "providerCalls": 1,
+          "window": "persisted_before_crash"
+        }
+      ],
+      "violations": []
+    },
+    {
+      "run": 47,
+      "fault": "random_delay",
+      "ticket": 7,
+      "crashed": true,
+      "workflowStatus": "COMPLETED",
+      "completedBeforeCrash": false,
+      "recoveryMs": 3489,
+      "outputMatchesReference": true,
+      "sideEffectCounts": {
+        "tool-0:customer_lookup": 1,
+        "tool-1:reply_sent": 1
+      },
+      "sideEffectsExactlyOnce": true,
+      "steps": [
+        {
+          "stepId": "llm-0",
+          "providerCalls": 1,
+          "window": "persisted_before_crash"
+        },
+        {
+          "stepId": "llm-1",
+          "providerCalls": 2,
+          "window": "in_window"
+        }
+      ],
+      "violations": []
+    },
+    {
+      "run": 48,
+      "fault": "after_provider_before_persist",
+      "ticket": 0,
+      "crashed": true,
+      "workflowStatus": "COMPLETED",
+      "completedBeforeCrash": false,
+      "recoveryMs": 3565,
+      "outputMatchesReference": true,
+      "sideEffectCounts": {
+        "tool-0:customer_lookup": 1,
+        "tool-1:reply_sent": 1
+      },
+      "sideEffectsExactlyOnce": true,
+      "steps": [
+        {
+          "stepId": "llm-0",
+          "providerCalls": 2,
+          "window": "in_window"
+        },
+        {
+          "stepId": "llm-1",
+          "providerCalls": 1,
+          "window": "after_crash"
+        }
+      ],
+      "violations": []
+    },
+    {
+      "run": 49,
+      "fault": "after_persist",
+      "ticket": 1,
+      "crashed": true,
+      "workflowStatus": "COMPLETED",
+      "completedBeforeCrash": false,
+      "recoveryMs": 959,
+      "outputMatchesReference": true,
+      "sideEffectCounts": {
+        "tool-0:customer_lookup": 1,
+        "tool-1:reply_sent": 1
+      },
+      "sideEffectsExactlyOnce": true,
+      "steps": [
+        {
+          "stepId": "llm-0",
+          "providerCalls": 1,
+          "window": "persisted_before_crash"
+        },
+        {
+          "stepId": "llm-1",
+          "providerCalls": 1,
+          "window": "after_crash"
+        }
+      ],
+      "violations": []
+    }
+  ],
+  "byFault": {
+    "after_provider_before_persist": {
+      "runs": 13,
+      "crashed": 13
+    },
+    "after_persist": {
+      "runs": 13,
+      "crashed": 13
+    },
+    "before_tool_commit": {
+      "runs": 12,
+      "crashed": 12
+    },
+    "random_delay": {
+      "runs": 12,
+      "crashed": 12
+    }
+  },
+  "windows": {
+    "persisted_before_crash": {
+      "steps": 52,
+      "callHistogram": {
+        "1": 52
+      },
+      "maxCalls": 1
+    },
+    "in_window": {
+      "steps": 16,
+      "callHistogram": {
+        "2": 16
+      },
+      "maxCalls": 2
+    },
+    "after_crash": {
+      "steps": 32,
+      "callHistogram": {
+        "1": 32
+      },
+      "maxCalls": 1
+    }
+  },
+  "recoveredRuns": 45,
+  "sideEffectsExactlyOnceRuns": 50,
+  "outputsMatchedReferenceRuns": 50,
+  "recoveryMs": {
+    "count": 45,
+    "min": 916,
+    "p50": 2292,
+    "p95": 3571,
+    "max": 3589
+  }
+}

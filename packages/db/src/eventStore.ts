@@ -89,6 +89,25 @@ export async function appendEvents(
         scheduledEventSeq: stored.seq,
         traceContext,
       });
+    } else if (stored.event.type === 'LLM_REQUESTED') {
+      // An LLM step is just another leased task — same lease/heartbeat/
+      // retry/DLQ machinery as an activity, a different task type so only
+      // workers that opted into LLM work pick it up.
+      await enqueue(client, {
+        taskType: 'llm',
+        workflowId,
+        scheduledEventSeq: stored.seq,
+        maxAttempts: stored.event.maxAttempts,
+        traceContext,
+      });
+    } else if (stored.event.type === 'TOOL_REQUESTED') {
+      await enqueue(client, {
+        taskType: 'tool',
+        workflowId,
+        scheduledEventSeq: stored.seq,
+        maxAttempts: stored.event.maxAttempts,
+        traceContext,
+      });
     } else if (stored.event.type === 'TimerScheduled') {
       // A durable timer is just a task whose run_after is in the future
       // (M1's dequeue query already only picks up run_after <= now()) —

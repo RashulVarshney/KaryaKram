@@ -9,6 +9,7 @@ export {
   fail,
   reclaimExpired,
   getQueueDepth,
+  isLeaseOwned,
 } from './queue';
 export type {
   Queryable,
@@ -21,6 +22,7 @@ export type {
   CompleteInput,
   FailInput,
   ReclaimExpiredInput,
+  LeaseFence,
 } from './queue';
 
 export { withTransaction } from './transaction';
@@ -31,7 +33,7 @@ export type { AppendEventsInput, AppendEventsResult } from './eventStore';
 export { listWorkflowExecutions, getWorkflowExecution } from './workflowExecutions';
 export type { WorkflowExecutionSummary } from './workflowExecutions';
 
-export { computeRetryDelaySeconds } from './backoff';
+export { computeRetryDelaySeconds, computeRetryDelayWithFloorSeconds } from './backoff';
 export type { RetryDelayOptions } from './backoff';
 
 export { listDeadTasks, requeueDeadTask } from './dlq';
@@ -47,3 +49,14 @@ export {
   getCurrentLeader,
 } from './leadership';
 export type { CurrentLeader } from './leadership';
+
+export { recordProviderCall, listProviderCalls, countProviderCallsByStep } from './providerAudit';
+export type { ProviderCallRecord, ProviderCallRow } from './providerAudit';
+
+export {
+  claimToolExecution,
+  completeToolExecution,
+  recordSideEffect,
+  listSideEffects,
+} from './toolStore';
+export type { ToolClaim, ClaimResult, SideEffectInput, SideEffectRow } from './toolStore';

@@ -164,11 +164,17 @@ export class Worker {
         }
       } catch (err) {
         const message = err instanceof Error ? err.message : String(err);
+        // A handler can ask for a minimum delay (e.g. a provider's Retry-After)
+        // by throwing an error that carries `retryAfterMs`.
+        const retryAfterMs = (err as { retryAfterMs?: unknown } | null)?.retryAfterMs;
         const applied = await fail(this.pool, {
           taskId: task.id,
           workerId: this.config.workerId,
           error: message,
           attempt: task.attempt,
+          ...(typeof retryAfterMs === 'number' && retryAfterMs > 0
+            ? { minDelaySeconds: retryAfterMs / 1000 }
+            : {}),
         });
         if (applied) {
           log.warn({ err }, 'task failed');

@@ -5,5 +5,18 @@
     "rootDir": "src"
   },
   "include": ["src"],
-  "references": [{ "path": "../packages/db" }]
+  "references": [
+    {
+      "path": "../packages/db"
+    },
+    {
+      "path": "../packages/worker-sdk"
+    },
+    {
+      "path": "../packages/llm"
+    },
+    {
+      "path": "../packages/core"
+    }
+  ]
 }

@@ -1,0 +1,160 @@
+$ pnpm --filter @karyakram/bench run chaos:llm
+$ dotenv -e ../.env -- tsx src/llmChaos.ts
+chaos: 50 runs, seed 20260105, scratch db karyakram_scratch_1791217840431
+{"level":30,"time":1791217840656,"pid":130622,"hostname":"Rashul-pc","component":"reaper","intervalMs":100,"msg":"reaper starting"}
+{"level":30,"time":1791217844859,"pid":130622,"hostname":"Rashul-pc","component":"reaper","count":1,"taskIds":["2"],"msg":"reclaimed expired leases"}
+run   0 after_provider_before_persist  crashed=true  done_before_kill=false COMPLETED recovery=2292ms  llm-0:in_windowx2 llm-1:after_crashx1
+{"level":30,"time":1791217848138,"pid":130622,"hostname":"Rashul-pc","component":"reaper","count":1,"taskIds":["2"],"msg":"reclaimed expired leases"}
+run   1 after_persist                  crashed=true  done_before_kill=false COMPLETED recovery=925ms  llm-0:persisted_before_crashx1 llm-1:after_crashx1
+{"level":30,"time":1791217851543,"pid":130622,"hostname":"Rashul-pc","component":"reaper","count":1,"taskIds":["11"],"msg":"reclaimed expired leases"}
+run   2 before_tool_commit             crashed=true  done_before_kill=false COMPLETED recovery=3369ms  llm-0:persisted_before_crashx1 llm-1:persisted_before_crashx1
+run   3 random_delay                   crashed=true  done_before_kill=true  COMPLETED recovery=nullms  llm-0:persisted_before_crashx1 llm-1:persisted_before_crashx1
+{"level":30,"time":1791217857008,"pid":130622,"hostname":"Rashul-pc","component":"reaper","count":1,"taskIds":["2"],"msg":"reclaimed expired leases"}
+run   4 after_provider_before_persist  crashed=true  done_before_kill=false COMPLETED recovery=2318ms  llm-0:in_windowx2 llm-1:after_crashx1
+{"level":30,"time":1791217860291,"pid":130622,"hostname":"Rashul-pc","component":"reaper","count":1,"taskIds":["2"],"msg":"reclaimed expired leases"}
+run   5 after_persist                  crashed=true  done_before_kill=false COMPLETED recovery=1050ms  llm-0:persisted_before_crashx1 llm-1:after_crashx1
+{"level":30,"time":1791217863985,"pid":130622,"hostname":"Rashul-pc","component":"reaper","count":1,"taskIds":["5"],"msg":"reclaimed expired leases"}
+run   6 before_tool_commit             crashed=true  done_before_kill=false COMPLETED recovery=3469ms  llm-0:persisted_before_crashx1 llm-1:after_crashx1
+{"level":30,"time":1791217868286,"pid":130622,"hostname":"Rashul-pc","component":"reaper","count":1,"taskIds":["2"],"msg":"reclaimed expired leases"}
+run   7 random_delay                   crashed=true  done_before_kill=false COMPLETED recovery=3589ms  llm-0:in_windowx2 llm-1:after_crashx1
+{"level":30,"time":1791217872697,"pid":130622,"hostname":"Rashul-pc","component":"reaper","count":1,"taskIds":["2"],"msg":"reclaimed expired leases"}
+run   8 after_provider_before_persist  crashed=true  done_before_kill=false COMPLETED recovery=2277ms  llm-0:in_windowx2 llm-1:after_crashx1
+{"level":30,"time":1791217875976,"pid":130622,"hostname":"Rashul-pc","component":"reaper","count":1,"taskIds":["5"],"msg":"reclaimed expired leases"}
+run   9 after_persist                  crashed=true  done_before_kill=false COMPLETED recovery=966ms  llm-0:persisted_before_crashx1 llm-1:after_crashx1
+{"level":30,"time":1791217879817,"pid":130622,"hostname":"Rashul-pc","component":"reaper","count":1,"taskIds":["11"],"msg":"reclaimed expired leases"}
+run  10 before_tool_commit             crashed=true  done_before_kill=false COMPLETED recovery=3353ms  llm-0:persisted_before_crashx1 llm-1:persisted_before_crashx1
+run  11 random_delay                   crashed=true  done_before_kill=true  COMPLETED recovery=nullms  llm-0:persisted_before_crashx1 llm-1:persisted_before_crashx1
+{"level":30,"time":1791217885097,"pid":130622,"hostname":"Rashul-pc","component":"reaper","count":1,"taskIds":["2"],"msg":"reclaimed expired leases"}
+run  12 after_provider_before_persist  crashed=true  done_before_kill=false COMPLETED recovery=2317ms  llm-0:in_windowx2 llm-1:after_crashx1
+{"level":30,"time":1791217888486,"pid":130622,"hostname":"Rashul-pc","component":"reaper","count":1,"taskIds":["5"],"msg":"reclaimed expired leases"}
+run  13 after_persist                  crashed=true  done_before_kill=false COMPLETED recovery=918ms  llm-0:persisted_before_crashx1 llm-1:after_crashx1
+{"level":30,"time":1791217891480,"pid":130622,"hostname":"Rashul-pc","component":"reaper","count":1,"taskIds":["5"],"msg":"reclaimed expired leases"}
+run  14 before_tool_commit             crashed=true  done_before_kill=false COMPLETED recovery=2235ms  llm-0:persisted_before_crashx1 llm-1:after_crashx1
+run  15 random_delay                   crashed=true  done_before_kill=true  COMPLETED recovery=nullms  llm-0:persisted_before_crashx1 llm-1:persisted_before_crashx1
+{"level":30,"time":1791217895877,"pid":130622,"hostname":"Rashul-pc","component":"reaper","count":1,"taskIds":["8"],"msg":"reclaimed expired leases"}
+run  16 after_provider_before_persist  crashed=true  done_before_kill=false COMPLETED recovery=2156ms  llm-0:persisted_before_crashx1 llm-1:in_windowx2
+{"level":30,"time":1791217898953,"pid":130622,"hostname":"Rashul-pc","component":"reaper","count":1,"taskIds":["5"],"msg":"reclaimed expired leases"}
+run  17 after_persist                  crashed=true  done_before_kill=false COMPLETED recovery=965ms  llm-0:persisted_before_crashx1 llm-1:after_crashx1
+{"level":30,"time":1791217902322,"pid":130622,"hostname":"Rashul-pc","component":"reaper","count":1,"taskIds":["11"],"msg":"reclaimed expired leases"}
+run  18 before_tool_commit             crashed=true  done_before_kill=false COMPLETED recovery=3332ms  llm-0:persisted_before_crashx1 llm-1:persisted_before_crashx1
+{"level":30,"time":1791217906734,"pid":130622,"hostname":"Rashul-pc","component":"reaper","count":1,"taskIds":["8"],"msg":"reclaimed expired leases"}
+run  19 random_delay                   crashed=true  done_before_kill=false COMPLETED recovery=3422ms  llm-0:persisted_before_crashx1 llm-1:after_crashx1
+{"level":30,"time":1791217910928,"pid":130622,"hostname":"Rashul-pc","component":"reaper","count":1,"taskIds":["2"],"msg":"reclaimed expired leases"}
+run  20 after_provider_before_persist  crashed=true  done_before_kill=false COMPLETED recovery=2277ms  llm-0:in_windowx2 llm-1:after_crashx1
+{"level":30,"time":1791217914095,"pid":130622,"hostname":"Rashul-pc","component":"reaper","count":1,"taskIds":["2"],"msg":"reclaimed expired leases"}
+run  21 after_persist                  crashed=true  done_before_kill=false COMPLETED recovery=922ms  llm-0:persisted_before_crashx1 llm-1:after_crashx1
+{"level":30,"time":1791217917400,"pid":130622,"hostname":"Rashul-pc","component":"reaper","count":1,"taskIds":["5"],"msg":"reclaimed expired leases"}
+run  22 before_tool_commit             crashed=true  done_before_kill=false COMPLETED recovery=3476ms  llm-0:persisted_before_crashx1 llm-1:after_crashx1
+{"level":30,"time":1791217921713,"pid":130622,"hostname":"Rashul-pc","component":"reaper","count":1,"taskIds":["1"],"msg":"reclaimed expired leases"}
+run  23 random_delay                   crashed=true  done_before_kill=false COMPLETED recovery=3580ms  llm-0:after_crashx1 llm-1:after_crashx1
+{"level":30,"time":1791217926154,"pid":130622,"hostname":"Rashul-pc","component":"reaper","count":1,"taskIds":["2"],"msg":"reclaimed expired leases"}
+run  24 after_provider_before_persist  crashed=true  done_before_kill=false COMPLETED recovery=3536ms  llm-0:in_windowx2 llm-1:after_crashx1
+{"level":30,"time":1791217930553,"pid":130622,"hostname":"Rashul-pc","component":"reaper","count":1,"taskIds":["2"],"msg":"reclaimed expired leases"}
+run  25 after_persist                  crashed=true  done_before_kill=false COMPLETED recovery=1002ms  llm-0:persisted_before_crashx1 llm-1:after_crashx1
+{"level":30,"time":1791217934038,"pid":130622,"hostname":"Rashul-pc","component":"reaper","count":1,"taskIds":["11"],"msg":"reclaimed expired leases"}
+run  26 before_tool_commit             crashed=true  done_before_kill=false COMPLETED recovery=3377ms  llm-0:persisted_before_crashx1 llm-1:persisted_before_crashx1
+{"level":30,"time":1791217938246,"pid":130622,"hostname":"Rashul-pc","component":"reaper","count":1,"taskIds":["4"],"msg":"reclaimed expired leases"}
+run  27 random_delay                   crashed=true  done_before_kill=false COMPLETED recovery=3528ms  llm-0:persisted_before_crashx1 llm-1:after_crashx1
+{"level":30,"time":1791217942769,"pid":130622,"hostname":"Rashul-pc","component":"reaper","count":1,"taskIds":["8"],"msg":"reclaimed expired leases"}
+run  28 after_provider_before_persist  crashed=true  done_before_kill=false COMPLETED recovery=3422ms  llm-0:persisted_before_crashx1 llm-1:in_windowx2
+{"level":30,"time":1791217947168,"pid":130622,"hostname":"Rashul-pc","component":"reaper","count":1,"taskIds":["5"],"msg":"reclaimed expired leases"}
+run  29 after_persist                  crashed=true  done_before_kill=false COMPLETED recovery=916ms  llm-0:persisted_before_crashx1 llm-1:after_crashx1
+{"level":30,"time":1791217950344,"pid":130622,"hostname":"Rashul-pc","component":"reaper","count":1,"taskIds":["5"],"msg":"reclaimed expired leases"}
+run  30 before_tool_commit             crashed=true  done_before_kill=false COMPLETED recovery=2228ms  llm-0:persisted_before_crashx1 llm-1:after_crashx1
+run  31 random_delay                   crashed=true  done_before_kill=true  COMPLETED recovery=nullms  llm-0:persisted_before_crashx1 llm-1:persisted_before_crashx1
+{"level":30,"time":1791217954637,"pid":130622,"hostname":"Rashul-pc","component":"reaper","count":1,"taskIds":["2"],"msg":"reclaimed expired leases"}
+run  32 after_provider_before_persist  crashed=true  done_before_kill=false COMPLETED recovery=3558ms  llm-0:in_windowx2 llm-1:after_crashx1
+{"level":30,"time":1791217959136,"pid":130622,"hostname":"Rashul-pc","component":"reaper","count":1,"taskIds":["5"],"msg":"reclaimed expired leases"}
+run  33 after_persist                  crashed=true  done_before_kill=false COMPLETED recovery=960ms  llm-0:persisted_before_crashx1 llm-1:after_crashx1
+{"level":30,"time":1791217962814,"pid":130622,"hostname":"Rashul-pc","component":"reaper","count":1,"taskIds":["11"],"msg":"reclaimed expired leases"}
+run  34 before_tool_commit             crashed=true  done_before_kill=false COMPLETED recovery=2100ms  llm-0:persisted_before_crashx1 llm-1:persisted_before_crashx1
+{"level":30,"time":1791217966081,"pid":130622,"hostname":"Rashul-pc","component":"reaper","count":1,"taskIds":["11"],"msg":"reclaimed expired leases"}
+run  35 random_delay                   crashed=true  done_before_kill=false COMPLETED recovery=2101ms  llm-0:persisted_before_crashx1 llm-1:persisted_before_crashx1
+{"level":30,"time":1791217969246,"pid":130622,"hostname":"Rashul-pc","component":"reaper","count":1,"taskIds":["8"],"msg":"reclaimed expired leases"}
+run  36 after_provider_before_persist  crashed=true  done_before_kill=false COMPLETED recovery=3484ms  llm-0:persisted_before_crashx1 llm-1:in_windowx2
+{"level":30,"time":1791217973642,"pid":130622,"hostname":"Rashul-pc","component":"reaper","count":1,"taskIds":["2"],"msg":"reclaimed expired leases"}
+run  37 after_persist                  crashed=true  done_before_kill=false COMPLETED recovery=999ms  llm-0:persisted_before_crashx1 llm-1:after_crashx1
+{"level":30,"time":1791217977523,"pid":130622,"hostname":"Rashul-pc","component":"reaper","count":1,"taskIds":["11"],"msg":"reclaimed expired leases"}
+run  38 before_tool_commit             crashed=true  done_before_kill=false COMPLETED recovery=3334ms  llm-0:persisted_before_crashx1 llm-1:persisted_before_crashx1
+run  39 random_delay                   crashed=true  done_before_kill=true  COMPLETED recovery=nullms  llm-0:persisted_before_crashx1 llm-1:persisted_before_crashx1
+{"level":30,"time":1791217983027,"pid":130622,"hostname":"Rashul-pc","component":"reaper","count":1,"taskIds":["8"],"msg":"reclaimed expired leases"}
+run  40 after_provider_before_persist  crashed=true  done_before_kill=false COMPLETED recovery=3424ms  llm-0:persisted_before_crashx1 llm-1:in_windowx2
+{"level":30,"time":1791217987337,"pid":130622,"hostname":"Rashul-pc","component":"reaper","count":1,"taskIds":["2"],"msg":"reclaimed expired leases"}
+run  41 after_persist                  crashed=true  done_before_kill=false COMPLETED recovery=958ms  llm-0:persisted_before_crashx1 llm-1:after_crashx1
+{"level":30,"time":1791217990498,"pid":130622,"hostname":"Rashul-pc","component":"reaper","count":1,"taskIds":["5"],"msg":"reclaimed expired leases"}
+run  42 before_tool_commit             crashed=true  done_before_kill=false COMPLETED recovery=2220ms  llm-0:persisted_before_crashx1 llm-1:after_crashx1
+{"level":30,"time":1791217993773,"pid":130622,"hostname":"Rashul-pc","component":"reaper","count":1,"taskIds":["8"],"msg":"reclaimed expired leases"}
+run  43 random_delay                   crashed=true  done_before_kill=false COMPLETED recovery=3408ms  llm-0:persisted_before_crashx1 llm-1:in_windowx2
+{"level":30,"time":1791217998169,"pid":130622,"hostname":"Rashul-pc","component":"reaper","count":1,"taskIds":["2"],"msg":"reclaimed expired leases"}
+run  44 after_provider_before_persist  crashed=true  done_before_kill=false COMPLETED recovery=3571ms  llm-0:in_windowx2 llm-1:after_crashx1
+{"level":30,"time":1791218002656,"pid":130622,"hostname":"Rashul-pc","component":"reaper","count":1,"taskIds":["5"],"msg":"reclaimed expired leases"}
+run  45 after_persist                  crashed=true  done_before_kill=false COMPLETED recovery=918ms  llm-0:persisted_before_crashx1 llm-1:after_crashx1
+{"level":30,"time":1791218005926,"pid":130622,"hostname":"Rashul-pc","component":"reaper","count":1,"taskIds":["11"],"msg":"reclaimed expired leases"}
+run  46 before_tool_commit             crashed=true  done_before_kill=false COMPLETED recovery=2108ms  llm-0:persisted_before_crashx1 llm-1:persisted_before_crashx1
+{"level":30,"time":1791218009091,"pid":130622,"hostname":"Rashul-pc","component":"reaper","count":1,"taskIds":["8"],"msg":"reclaimed expired leases"}
+run  47 random_delay                   crashed=true  done_before_kill=false COMPLETED recovery=3489ms  llm-0:persisted_before_crashx1 llm-1:in_windowx2
+{"level":30,"time":1791218013385,"pid":130622,"hostname":"Rashul-pc","component":"reaper","count":1,"taskIds":["2"],"msg":"reclaimed expired leases"}
+run  48 after_provider_before_persist  crashed=true  done_before_kill=false COMPLETED recovery=3565ms  llm-0:in_windowx2 llm-1:after_crashx1
+{"level":30,"time":1791218017882,"pid":130622,"hostname":"Rashul-pc","component":"reaper","count":1,"taskIds":["2"],"msg":"reclaimed expired leases"}
+run  49 after_persist                  crashed=true  done_before_kill=false COMPLETED recovery=959ms  llm-0:persisted_before_crashx1 llm-1:after_crashx1
+{"level":30,"time":1791218018164,"pid":130622,"hostname":"Rashul-pc","component":"reaper","msg":"reaper stopped"}
+
+== summary ==
+{
+  "runs": 50,
+  "seed": 20260105,
+  "violations": 0,
+  "byFault": {
+    "after_provider_before_persist": {
+      "runs": 13,
+      "crashed": 13
+    },
+    "after_persist": {
+      "runs": 13,
+      "crashed": 13
+    },
+    "before_tool_commit": {
+      "runs": 12,
+      "crashed": 12
+    },
+    "random_delay": {
+      "runs": 12,
+      "crashed": 12
+    }
+  },
+  "windows": {
+    "persisted_before_crash": {
+      "steps": 52,
+      "callHistogram": {
+        "1": 52
+      },
+      "maxCalls": 1
+    },
+    "in_window": {
+      "steps": 16,
+      "callHistogram": {
+        "2": 16
+      },
+      "maxCalls": 2
+    },
+    "after_crash": {
+      "steps": 32,
+      "callHistogram": {
+        "1": 32
+      },
+      "maxCalls": 1
+    }
+  },
+  "recoveredRuns": 45,
+  "sideEffectsExactlyOnceRuns": 50,
+  "outputsMatchedReferenceRuns": 50,
+  "recoveryMs": {
+    "count": 45,
+    "min": 916,
+    "p50": 2292,
+    "p95": 3571,
+    "max": 3589
+  }
+}
+
+raw results: ../docs/results/chaos-2026-10-05T16-30-40-652Z.json

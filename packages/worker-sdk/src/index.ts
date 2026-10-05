@@ -37,3 +37,39 @@ export {
   getActivityExecutionCount,
 } from './examples/reserveChargeShip';
 export type { OrderInput, OrderResult } from './examples/reserveChargeShip';
+
+export { createLlmCallHandler } from './llmHandler';
+export type { LlmCallHandlerOptions } from './llmHandler';
+export {
+  loadLlmStepConfig,
+  redactSecrets,
+  truncateUtf8,
+  buildStoredRequest,
+  capResponse,
+  DEFAULT_MAX_STORED_BYTES,
+  DEFAULT_LLM_MAX_ATTEMPTS,
+} from './llmConfig';
+export type { LlmStepConfig, StoredRequest, CappedResponse } from './llmConfig';
+export { LeaseLostError, appendStepOutcome, assertLeaseOwned, hasStepOutcome } from './fencing';
+export { maybeFault, armRandomDelayFault } from './faults';
+export type { FaultPoint } from './faults';
+
+export { createToolCallHandler } from './toolHandler';
+export type { ToolCallHandlerOptions } from './toolHandler';
+export { ToolRegistry, ToolError } from './tools';
+export type { ToolContext, ToolDefinition, ToolValidation } from './tools';
+
+export { supportTicketTriage, sampleTicket } from './examples/supportTriage';
+export type { TriageInput, TriageResult } from './examples/supportTriage';
+export { createSupportToolRegistry } from './examples/supportTools';
+export type { Customer, SentReply } from './examples/supportTools';
+
+export { runChaos, summarize, CHAOS_FAULTS } from './chaos/chaosRunner';
+export type {
+  ChaosOptions,
+  ChaosRunResult,
+  ChaosSummary,
+  ChaosFault,
+  StepWindow,
+  StepAudit,
+} from './chaos/chaosRunner';

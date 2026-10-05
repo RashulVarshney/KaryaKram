@@ -18,3 +18,16 @@ export function computeRetryDelaySeconds(attempt: number, options: RetryDelayOpt
   const cappedExponential = Math.min(maxSeconds, baseSeconds * 2 ** (attempt - 1));
   return random() * cappedExponential;
 }
+
+/**
+ * `max(full-jitter backoff, floor)`. Backoff spreads retries out; the
+ * floor (e.g. a provider's `Retry-After`) says we must never retry
+ * *sooner* than that, whatever the jitter drew.
+ */
+export function computeRetryDelayWithFloorSeconds(
+  attempt: number,
+  minDelaySeconds = 0,
+  options: RetryDelayOptions = {},
+): number {
+  return Math.max(computeRetryDelaySeconds(attempt, options), minDelaySeconds);
+}

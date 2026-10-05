@@ -12,17 +12,22 @@
     "demo": "dotenv -e ../../.env -- tsx src/bin/demo.ts",
     "demo:m3": "dotenv -e ../../.env -- tsx src/bin/demo-m3.ts",
     "demo:m4": "dotenv -e ../../.env -- tsx src/bin/demo-m4.ts",
-    "demo:m8": "tsx src/bin/demo-m8.ts"
+    "demo:m8": "tsx src/bin/demo-m8.ts",
+    "demo:llm": "dotenv -e ../../.env -- tsx src/bin/demo-triage.ts"
   },
   "dependencies": {
     "@karyakram/core": "workspace:*",
     "@karyakram/db": "workspace:*",
+    "@karyakram/llm": "workspace:*",
     "@karyakram/observability": "workspace:*",
     "@opentelemetry/api": "^1.9.1",
+    "ajv": "^8.17.1",
     "pg": "^8.23.0",
     "pino": "^10.3.1"
   },
   "devDependencies": {
+    "@opentelemetry/sdk-trace-base": "^2.10.0",
+    "@opentelemetry/sdk-trace-node": "^2.10.0",
     "@types/pg": "^8.21.0",
     "dotenv-cli": "^11.0.0",
     "prom-client": "^15.1.3"

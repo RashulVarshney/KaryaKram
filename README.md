@@ -373,8 +373,117 @@ of scope, why the chaos checks reuse M4's timer workflow and M6's leader
 election instead of inventing new scenarios) is in
 [`docs/08-kubernetes.md`](./docs/08-kubernetes.md).
 
+## Durable LLM-agent steps
+
+Workflows can now call an LLM or a side-effecting tool as a _durable step_:
+
+```ts
+const triage = defineWorkflow('support-ticket-triage', async (input, ctx) => {
+  const label = await ctx.llmCall({ model: 'default', messages: [/* ... */] });
+  const customer = await ctx.toolCall('lookup_customer', { customerId: input.customerId });
+  const draft = await ctx.llmCall({ model: 'default', messages: [/* uses label + customer */] });
+  return ctx.toolCall('send_reply', {
+    ticketId: input.ticketId,
+    to: customer.email,
+    body: draft.text,
+  });
+});
+```
+
+An LLM answer is expensive and not reproducible, so the engine never regenerates one it already has:
+the request is logged **before** the call (`LLM_REQUESTED`), the result after (`LLM_COMPLETED`), and on every
+replay the recorded output is handed back to the workflow function. Tools are idempotent by construction.
+Full write-up of what was built and measured: [`docs/RESULTS.md`](./docs/RESULTS.md); every judgment call is in
+[`docs/DECISIONS.md`](./docs/DECISIONS.md).
+
+```mermaid
+flowchart LR
+  subgraph PG[(PostgreSQL)]
+    EV[workflow_events<br/>LLM_/TOOL_ events]
+    TQ[tasks<br/>workflow / llm / tool]
+    AU[provider_call_audit<br/>independent call log]
+    TE[tool_executions<br/>PK workflow_id, step_id]
+    SE[side_effects]
+  end
+  WW[workflow worker<br/>replays workflow code] -- "command -> LLM_REQUESTED + task" --> EV
+  EV --> TQ
+  TQ -- "lease (SKIP LOCKED) + heartbeat" --> LW[llm worker]
+  TQ -- "lease" --> TW[tool worker]
+  LW -- complete --> P{{LLM provider<br/>mock or Anthropic}}
+  P -.every call.-> AU
+  LW -- "fenced txn: lease still mine? -> LLM_COMPLETED" --> EV
+  TW -- "ONE txn: claim step + run tool + record result + TOOL_COMPLETED" --> TE
+  TW --> SE
+  EV -- "replay: reuse recorded output,<br/>hash mismatch -> workflow fails" --> WW
+  EV --> UI[React time-travel debugger<br/>prompt / response / tokens / latency / replayed]
+```
+
+**How the guarantees are built**
+
+- **Replay reuses recorded output.** `request_hash = sha256(canonical JSON of model, messages, params, tools)`. On replay a
+  completed step with a matching hash returns its recorded output with no provider call; a different hash fails the
+  workflow with a message naming the step (`NonDeterminismError`) instead of silently re-calling.
+- **Fencing.** The result is written in one transaction that first row-locks the task and checks the worker still holds
+  the lease (token = `leased_by` + `attempt`). A worker that lost its lease discards its result.
+- **Heartbeats** keep the lease alive while a slow provider call is in flight.
+- **Tools** claim `tool_executions (workflow_id, step_id)`, run, record the result and append the event in a single
+  transaction, so a crash before commit rolls everything back and a concurrent duplicate waits and reuses the result.
+- **Retries:** 429/5xx/timeouts retry with full-jitter backoff (a provider `Retry-After` is a floor), non-retryable 4xx
+  don't, and after the max attempts the step is recorded as failed _and_ the task lands in the dead-letter queue.
+- **Storage controls:** a size cap (default 256 KB) with a `truncated` flag, `KARYAKRAM_STORE_PROMPTS=false` to store
+  only hashes of prompts, and a redaction hook for API-key-like strings in stored prompts.
+
+**Run it**
+
+```bash
+pnpm install && pnpm build
+pnpm test                               # unit + integration (needs Docker); chaos test runs 50 kill -9 cycles (~5 min)
+KARYAKRAM_CHAOS_RUNS=10 pnpm test:integration   # a shorter chaos run
+pnpm chaos:llm                          # the 50-run chaos harness against a throwaway DB, raw JSON -> docs/results/
+pnpm bench:llm                          # live overhead / replay / throughput benchmarks, raw JSON -> docs/results/
+pnpm db:migrate && pnpm demo:llm        # the support-ticket triage demo (mock provider, no key needed)
+LLM_PROVIDER=anthropic ANTHROPIC_API_KEY=... pnpm demo:llm   # a real model (see Limitations)
+```
+
+Tests and benchmarks use a deterministic mock provider and need no network or API key. Selecting
+`LLM_PROVIDER=anthropic` without a key is an error; it never falls back to the mock.
+
+**Headline results** (single machine, mock provider; details and caveats in [`docs/RESULTS.md`](./docs/RESULTS.md)):
+
+- 50/50 runs killed with `kill -9` at four fault points completed with output identical to a no-crash run and every
+  side effect applied exactly once; provider calls per step were exactly 1 except for the 16 steps killed inside the
+  unavoidable window, which were called exactly twice.
+- Running a provider call as a durable step added ≈ 11 ms at the median (independent of provider latency); replaying a
+  recorded step costs ≈ 3–4 µs each beyond a ≈ 0.06 ms base.
+
+### Limitations (read these)
+
+- **LLM output is not deterministic and is not regenerated.** Durability means the _recorded_ answer is reused, not that
+  the same prompt would give the same answer again. Workflow code itself must stay deterministic (no clock, no randomness,
+  no env reads) because it is replayed from the top.
+- **There is a crash window where one provider call repeats.** If a worker dies after the provider returns but before the
+  result commits, the retry calls the provider again (measured: 16 of 16 steps killed there were called twice). The
+  guarantee is _at most one_ extra call in that window, not zero. If a call has a real cost or effect, budget for it.
+- **Tool exactly-once is a database property.** It holds for effects performed through the transaction's connection. For an
+  external system (an email API, a payment provider) the handler only gets an idempotency key to pass along; that narrows
+  the duplicate window but cannot remove it.
+- **No streaming.** Responses are requested and stored whole.
+- **Editing a prompt while workflows are in flight fails them** (hash mismatch). There is no versioning/patching mechanism
+  to migrate in-flight workflows.
+- **`AnthropicProvider` has not been run against the real API in this repo** (no key was available). It is unit-tested for
+  request building, response mapping and error classification with a fake client, nothing more. Likewise the demo's
+  mock "classification" is hash-tagged placeholder text, not a real category.
+- **Truncation/redaction affect what is stored, and therefore what workflow code sees on replay.** Hash-only mode keeps
+  prompts out of the log but the response is still stored, because replay must return it.
+- **Cost estimates** come from a configurable price table that drifts; unknown models report no cost rather than zero.
+- **Measurement scope:** one developer machine, mock provider, Postgres on localhost, 50 chaos runs with self-inflicted
+  kills at chosen points (no network partitions, no database crashes). Recovery times depend on the lease length.
+- **The React debugger's rendering is not component-tested** (the repo has no DOM test setup); its logic is unit-tested.
+- One pre-existing integration test (`metrics.integration.test.ts`) is flaky by construction (random backoff vs. a fixed
+  100 ms assertion window); it is untouched — see `docs/DECISIONS.md`.
+
 ## Status
 
-M0 through M8 complete — every milestone in the original roadmap. See
+M0 through M8 complete — every milestone in the original roadmap — plus durable LLM/tool steps (this section). See
 [`docs/plans/README.md`](./docs/plans/README.md) for the full milestone
 index.
