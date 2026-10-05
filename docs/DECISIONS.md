@@ -48,3 +48,21 @@ Open choices made without asking, recorded as they come up. Newest at the bottom
     2/1/1). The jitter distribution in `fail()` is unchanged by this branch (only a `max(..., 0)`
     was added), so this is flakiness by construction, not a regression — but I did not reproduce it
     on the baseline commit, so that is analysis, not proof. I did not edit the test.
+13. **Tool exactly-once is a database transaction, not a convention.** One transaction does: early
+    (non-locking) lease check -> claim `tool_executions (workflow_id, step_id)` -> run the tool
+    through the transaction's connection -> record the result -> locking lease check -> append
+    `TOOL_COMPLETED` -> commit. A crash before commit rolls everything back (the retry starts
+    clean); a concurrent duplicate blocks on the claim's unique index and then reuses the stored
+    result. This holds for side effects done via `ctx.client`. For side effects outside Postgres the
+    handler gets an `idempotencyKey` to pass to the external system, which narrows but cannot close
+    the duplicate window — documented as a limitation.
+14. **The lease row lock is taken late for tools.** Holding `FOR UPDATE` on the task row for the
+    whole tool run would block this worker's own heartbeat `UPDATE`, so the early check is
+    non-locking and only the final check before the events locks the row.
+15. **Extra fault point `before_tool_commit`** (beyond the three in the brief) kills the process
+    after the tool's side effect and outcome are written but before COMMIT — the window the
+    transactional design exists to make safe — so the chaos test can exercise it directly.
+16. **Test hygiene lesson recorded:** integration tests load `@karyakram/db` from `dist/`, so a
+    mutation made to `src` must be followed by `tsc -b` to take effect. My first exactly-once
+    mutation check silently did nothing for that reason; it was redone after a rebuild and then
+    failed as it should.

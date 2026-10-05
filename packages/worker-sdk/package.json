@@ -20,6 +20,7 @@
     "@karyakram/llm": "workspace:*",
     "@karyakram/observability": "workspace:*",
     "@opentelemetry/api": "^1.9.1",
+    "ajv": "^8.17.1",
     "pg": "^8.23.0",
     "pino": "^10.3.1"
   },

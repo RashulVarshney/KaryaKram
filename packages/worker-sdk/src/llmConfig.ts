@@ -8,6 +8,7 @@ import { loadPriceTable, type PriceTable } from '@karyakram/llm';
 
 export const DEFAULT_MAX_STORED_BYTES = 256 * 1024;
 export const DEFAULT_LLM_MAX_ATTEMPTS = 5;
+export const DEFAULT_TOOL_MAX_ATTEMPTS = 3;
 
 export interface LlmStepConfig {
   /** KARYAKRAM_STORE_PROMPTS=false stores only the request hash, never the prompt. */
@@ -16,6 +17,8 @@ export interface LlmStepConfig {
   maxStoredBytes: number;
   /** Provider attempts before the task is dead-lettered. */
   maxAttempts: number;
+  /** Attempts for a tool step before it is dead-lettered. */
+  toolMaxAttempts: number;
   priceTable: PriceTable;
   /** Applied to the *stored* copy of a prompt only — never to what is sent to the provider. */
   redact: (text: string) => string;
@@ -72,6 +75,11 @@ export function loadLlmStepConfig(
       'KARYAKRAM_LLM_MAX_ATTEMPTS',
       env['KARYAKRAM_LLM_MAX_ATTEMPTS'],
       DEFAULT_LLM_MAX_ATTEMPTS,
+    ),
+    toolMaxAttempts: envPositiveInt(
+      'KARYAKRAM_TOOL_MAX_ATTEMPTS',
+      env['KARYAKRAM_TOOL_MAX_ATTEMPTS'],
+      DEFAULT_TOOL_MAX_ATTEMPTS,
     ),
     priceTable: loadPriceTable(env),
     redact: redactSecrets,

@@ -228,6 +228,9 @@ importers:
       '@opentelemetry/api':
         specifier: ^1.9.1
         version: 1.9.1
+      ajv:
+        specifier: ^8.17.1
+        version: 8.20.0
       pg:
         specifier: ^8.23.0
         version: 8.23.0

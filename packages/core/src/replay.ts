@@ -5,7 +5,7 @@
  * ECMAScript spec, not the environment, so this produces identical
  * output for identical input every time, on any machine.
  */
-import { canonicalLlmRequest, type LlmCallResult, type LlmRequest } from './llm';
+import { canonicalLlmRequest, canonicalToolCall, type LlmCallResult, type LlmRequest } from './llm';
 import type {
   ActivityScheduledEvent,
   LlmCompletedEvent,
@@ -14,6 +14,9 @@ import type {
   SignalReceivedEvent,
   StoredWorkflowEvent,
   TimerScheduledEvent,
+  ToolCompletedEvent,
+  ToolFailedEvent,
+  ToolRequestedEvent,
 } from './workflow';
 
 export interface WorkflowContext {
@@ -46,6 +49,14 @@ export interface WorkflowContext {
    * `StepRequestMismatchError` instead of silently re-calling.
    */
   llmCall(request: LlmRequest): Promise<LlmCallResult>;
+  /**
+   * A durable, idempotent tool call (a side-effecting function from the
+   * worker's registry). Same contract as `llmCall`: never executes
+   * anything itself, emits a `RequestToolCall` command the first time,
+   * resolves with the recorded result on every replay, and throws
+   * `StepRequestMismatchError` if the tool name or arguments changed.
+   */
+  toolCall<Result = unknown>(tool: string, args: unknown): Promise<Result>;
 }
 
 export type WorkflowFn<Input = unknown, Result = unknown> = (
@@ -58,7 +69,8 @@ export type WorkflowCommand =
   | { type: 'CompleteWorkflow'; result: unknown }
   | { type: 'FailWorkflow'; error: string }
   | { type: 'ScheduleTimer'; durationMs: number }
-  | { type: 'RequestLlmCall'; stepId: string; request: LlmRequest; requestHash: string };
+  | { type: 'RequestLlmCall'; stepId: string; request: LlmRequest; requestHash: string }
+  | { type: 'RequestToolCall'; stepId: string; tool: string; args: unknown; argsHash: string };
 
 /**
  * Thrown when the currently-running code's Nth `scheduleActivity` call
@@ -100,15 +112,21 @@ export class StepRequestMismatchError extends NonDeterminismError {
     callIndex: number,
     public readonly expectedHash: string,
     public readonly actualHash: string,
+    public readonly kind: 'llm' | 'tool' = 'llm',
   ) {
     super(
       callIndex,
       expectedHash,
       actualHash,
-      `Non-deterministic workflow: step "${stepId}" was recorded with request hash ` +
-        `${expectedHash.slice(0, 12)}, but the running code now produces ${actualHash.slice(0, 12)}. ` +
-        `The model, prompt, params or tool definitions changed since this step was requested; ` +
-        `refusing to silently re-call the provider.`,
+      kind === 'llm'
+        ? `Non-deterministic workflow: step "${stepId}" was recorded with request hash ` +
+            `${expectedHash.slice(0, 12)}, but the running code now produces ${actualHash.slice(0, 12)}. ` +
+            `The model, prompt, params or tool definitions changed since this step was requested; ` +
+            `refusing to silently re-call the provider.`
+        : `Non-deterministic workflow: step "${stepId}" was recorded with arguments hash ` +
+            `${expectedHash.slice(0, 12)}, but the running code now produces ${actualHash.slice(0, 12)}. ` +
+            `The tool name or its arguments changed since this step was requested; ` +
+            `refusing to silently re-execute the tool.`,
     );
     this.name = 'StepRequestMismatchError';
   }
@@ -163,6 +181,15 @@ function isLlmRequested(
   return e.event.type === 'LLM_REQUESTED';
 }
 
+function isToolRequested(
+  e: StoredWorkflowEvent,
+): e is StoredWorkflowEvent & { event: ToolRequestedEvent } {
+  return e.event.type === 'TOOL_REQUESTED';
+}
+
+type ToolOutcome =
+  { kind: 'completed'; event: ToolCompletedEvent } | { kind: 'failed'; event: ToolFailedEvent };
+
 type LlmOutcome =
   { kind: 'completed'; event: LlmCompletedEvent } | { kind: 'failed'; event: LlmFailedEvent };
 
@@ -181,6 +208,7 @@ export async function replay<Input = unknown, Result = unknown>(
 ): Promise<ReplayResult> {
   const scheduledEvents = history.filter(isActivityScheduled);
   const llmRequestedEvents = history.filter(isLlmRequested);
+  const toolRequestedEvents = history.filter(isToolRequested);
   const timerEvents = history.filter(isTimerScheduled);
 
   const signalEventsByName = new Map<
@@ -196,8 +224,14 @@ export async function replay<Input = unknown, Result = unknown>(
 
   const outcomeBySeq = new Map<number, ActivityOutcome>();
   const llmOutcomeBySeq = new Map<number, LlmOutcome>();
+  const toolOutcomeBySeq = new Map<number, ToolOutcome>();
   const firedTimerSeqs = new Set<number>();
   for (const { event } of history) {
+    if (event.type === 'TOOL_COMPLETED') {
+      toolOutcomeBySeq.set(event.scheduledEventSeq, { kind: 'completed', event });
+    } else if (event.type === 'TOOL_FAILED') {
+      toolOutcomeBySeq.set(event.scheduledEventSeq, { kind: 'failed', event });
+    }
     if (event.type === 'LLM_COMPLETED') {
       llmOutcomeBySeq.set(event.scheduledEventSeq, { kind: 'completed', event });
     } else if (event.type === 'LLM_FAILED') {
@@ -216,6 +250,7 @@ export async function replay<Input = unknown, Result = unknown>(
   let callIndex = 0;
   let timerCallIndex = 0;
   let llmCallIndex = 0;
+  let toolCallIndex = 0;
   let nonDeterminismError: NonDeterminismError | null = null;
   const pendingLlmRequests: Record<string, LlmRequest> = {};
 
@@ -323,6 +358,43 @@ export async function replay<Input = unknown, Result = unknown>(
 
       commands.push({ type: 'RequestLlmCall', stepId, request, requestHash });
       return new Promise<LlmCallResult>(() => {
+        /* never resolves — this pass ends here; the new command is what matters */
+      });
+    },
+
+    toolCall<T>(tool: string, args: unknown): Promise<T> {
+      const hash = options.hash;
+      if (!hash) {
+        throw new Error('replay: options.hash is required to use ctx.toolCall');
+      }
+      const index = toolCallIndex++;
+      const stepId = `tool-${index}`;
+      const argsHash = hash(canonicalToolCall(tool, args));
+      const scheduled = toolRequestedEvents[index];
+
+      if (scheduled) {
+        if (scheduled.event.stepId !== stepId || scheduled.event.argsHash !== argsHash) {
+          nonDeterminismError = new StepRequestMismatchError(
+            stepId,
+            index,
+            scheduled.event.argsHash,
+            argsHash,
+            'tool',
+          );
+          return new Promise<T>(() => {
+            /* never resolves — this pass is being aborted via nonDeterminismError */
+          });
+        }
+        const outcome = toolOutcomeBySeq.get(scheduled.seq);
+        if (outcome?.kind === 'completed') return Promise.resolve(outcome.event.result as T);
+        if (outcome?.kind === 'failed') return Promise.reject(new Error(outcome.event.error));
+        return new Promise<T>(() => {
+          /* never resolves — waiting on a tool call already in flight */
+        });
+      }
+
+      commands.push({ type: 'RequestToolCall', stepId, tool, args, argsHash });
+      return new Promise<T>(() => {
         /* never resolves — this pass ends here; the new command is what matters */
       });
     },

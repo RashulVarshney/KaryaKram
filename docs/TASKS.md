@@ -3,7 +3,7 @@
 - [x] Phase 0: explore, baseline (unit 43 / integration 39 passing), ARCHITECTURE_NOTES.md
 - [x] Phase 1: provider abstraction (LLMProvider, MockProvider, AnthropicProvider, provider_call_audit)
 - [x] Phase 2: durable llm_call step (events, hash, replay reuse, fencing, heartbeat, size cap, redaction)
-- [ ] Phase 3: durable tool_call step (registry, schema validation, tool_executions idempotency)
+- [x] Phase 3: durable tool_call step (registry, schema validation, tool_executions idempotency)
 - [ ] Phase 4: retries (backoff + jitter, retryAfterMs, DLQ)
 - [ ] Phase 5: OTel spans + React debugger rendering
 - [ ] Phase 6: support-ticket triage demo workflow + run script

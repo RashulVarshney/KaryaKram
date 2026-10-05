@@ -36,6 +36,15 @@ function commandToEvent(command: WorkflowCommand, llm: LlmStepConfig): WorkflowE
         maxAttempts: llm.maxAttempts,
       };
     }
+    case 'RequestToolCall':
+      return {
+        type: 'TOOL_REQUESTED',
+        stepId: command.stepId,
+        tool: command.tool,
+        args: command.args,
+        argsHash: command.argsHash,
+        maxAttempts: llm.toolMaxAttempts,
+      };
     case 'ScheduleTimer':
       // The one place `Date.now()` is allowed to enter this whole flow:
       // `replay()` (packages/core) only ever deals in the *duration* the

@@ -52,3 +52,11 @@ export type { CurrentLeader } from './leadership';
 
 export { recordProviderCall, listProviderCalls, countProviderCallsByStep } from './providerAudit';
 export type { ProviderCallRecord, ProviderCallRow } from './providerAudit';
+
+export {
+  claimToolExecution,
+  completeToolExecution,
+  recordSideEffect,
+  listSideEffects,
+} from './toolStore';
+export type { ToolClaim, ClaimResult, SideEffectInput, SideEffectRow } from './toolStore';

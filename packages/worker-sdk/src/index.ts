@@ -53,3 +53,8 @@ export type { LlmStepConfig, StoredRequest, CappedResponse } from './llmConfig';
 export { LeaseLostError, appendStepOutcome, assertLeaseOwned, hasStepOutcome } from './fencing';
 export { maybeFault, armRandomDelayFault } from './faults';
 export type { FaultPoint } from './faults';
+
+export { createToolCallHandler } from './toolHandler';
+export type { ToolCallHandlerOptions } from './toolHandler';
+export { ToolRegistry, ToolError } from './tools';
+export type { ToolContext, ToolDefinition, ToolValidation } from './tools';

@@ -100,6 +100,14 @@ export async function appendEvents(
         maxAttempts: stored.event.maxAttempts,
         traceContext,
       });
+    } else if (stored.event.type === 'TOOL_REQUESTED') {
+      await enqueue(client, {
+        taskType: 'tool',
+        workflowId,
+        scheduledEventSeq: stored.seq,
+        maxAttempts: stored.event.maxAttempts,
+        traceContext,
+      });
     } else if (stored.event.type === 'TimerScheduled') {
       // A durable timer is just a task whose run_after is in the future
       // (M1's dequeue query already only picks up run_after <= now()) —

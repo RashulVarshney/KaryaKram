@@ -382,11 +382,16 @@ export interface LeaseFence {
  * as well as `leased_by` is what makes it a fencing *token*: if the same
  * worker id re-leases the task, the older invocation still fails the check.
  */
-export async function isLeaseOwned(client: Queryable, fence: LeaseFence): Promise<boolean> {
+export async function isLeaseOwned(
+  client: Queryable,
+  fence: LeaseFence,
+  options: { lock?: boolean } = {},
+): Promise<boolean> {
+  const { lock = true } = options;
   const result = await client.query(
     `SELECT 1 FROM tasks
       WHERE id = $1 AND status = 'leased' AND leased_by = $2 AND attempt = $3
-      FOR UPDATE`,
+      ${lock ? 'FOR UPDATE' : ''}`,
     [fence.taskId, fence.workerId, fence.attempt],
   );
   return (result.rowCount ?? 0) > 0;

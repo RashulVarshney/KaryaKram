@@ -121,6 +121,41 @@ export interface LlmFailedEvent {
   attempts: number;
 }
 
+export interface ToolRequestedEvent {
+  type: 'TOOL_REQUESTED';
+  /** Deterministic, derived from call position: `tool-0`, `tool-1`, ... */
+  stepId: string;
+  tool: string;
+  args: unknown;
+  /** sha256 of the canonical JSON of (tool, args). */
+  argsHash: string;
+  maxAttempts: number;
+}
+
+export interface ToolCompletedEvent {
+  type: 'TOOL_COMPLETED';
+  stepId: string;
+  /** seq of the TOOL_REQUESTED event this completion belongs to. */
+  scheduledEventSeq: number;
+  tool: string;
+  result: unknown;
+  latencyMs: number;
+  /** Task attempt that produced this result. */
+  attempt: number;
+}
+
+export interface ToolFailedEvent {
+  type: 'TOOL_FAILED';
+  stepId: string;
+  scheduledEventSeq: number;
+  tool: string;
+  error: string;
+  /** e.g. unknown_tool | invalid_args | tool_error */
+  code: string;
+  retryable: boolean;
+  attempts: number;
+}
+
 export type WorkflowEventPayload =
   | WorkflowStartedEvent
   | ActivityScheduledEvent
@@ -135,7 +170,10 @@ export type WorkflowEventPayload =
   | WorkflowCanceledEvent
   | LlmRequestedEvent
   | LlmCompletedEvent
-  | LlmFailedEvent;
+  | LlmFailedEvent
+  | ToolRequestedEvent
+  | ToolCompletedEvent
+  | ToolFailedEvent;
 
 /**
  * An event as stored: `seq` is assigned by the event store at append
@@ -181,6 +219,18 @@ export interface LlmCallState {
   error?: string;
 }
 
+export type ToolCallStatus = 'REQUESTED' | 'COMPLETED' | 'FAILED';
+
+export interface ToolCallState {
+  stepId: string;
+  tool: string;
+  status: ToolCallStatus;
+  argsHash: string;
+  result?: unknown;
+  latencyMs?: number;
+  error?: string;
+}
+
 export type WorkflowStatus = 'RUNNING' | 'COMPLETED' | 'FAILED' | 'CANCELED';
 
 export interface WorkflowState {
@@ -193,6 +243,8 @@ export interface WorkflowState {
   timers: Record<number, TimerState>;
   /** Keyed by the LLM_REQUESTED event's seq. */
   llmCalls: Record<number, LlmCallState>;
+  /** Keyed by the TOOL_REQUESTED event's seq. */
+  toolCalls: Record<number, ToolCallState>;
   /** Payloads received so far, per signal name, in arrival order. */
   signals: Record<string, unknown[]>;
   result?: unknown;
@@ -204,6 +256,7 @@ export const initialState: WorkflowState = {
   activities: {},
   timers: {},
   llmCalls: {},
+  toolCalls: {},
   signals: {},
 };
 
@@ -342,6 +395,49 @@ export function applyEvent(state: WorkflowState, stored: StoredWorkflowEvent): W
         ...state,
         llmCalls: {
           ...state.llmCalls,
+          [event.scheduledEventSeq]: { ...existing, status: 'FAILED', error: event.error },
+        },
+      };
+    }
+
+    case 'TOOL_REQUESTED':
+      return {
+        ...state,
+        toolCalls: {
+          ...state.toolCalls,
+          [stored.seq]: {
+            stepId: event.stepId,
+            tool: event.tool,
+            status: 'REQUESTED',
+            argsHash: event.argsHash,
+          },
+        },
+      };
+
+    case 'TOOL_COMPLETED': {
+      const existing = state.toolCalls[event.scheduledEventSeq];
+      if (!existing) return state;
+      return {
+        ...state,
+        toolCalls: {
+          ...state.toolCalls,
+          [event.scheduledEventSeq]: {
+            ...existing,
+            status: 'COMPLETED',
+            result: event.result,
+            latencyMs: event.latencyMs,
+          },
+        },
+      };
+    }
+
+    case 'TOOL_FAILED': {
+      const existing = state.toolCalls[event.scheduledEventSeq];
+      if (!existing) return state;
+      return {
+        ...state,
+        toolCalls: {
+          ...state.toolCalls,
           [event.scheduledEventSeq]: { ...existing, status: 'FAILED', error: event.error },
         },
       };

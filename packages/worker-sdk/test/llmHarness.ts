@@ -4,6 +4,8 @@ import { getEvents } from '@karyakram/db';
 import { PgProviderCallAudit, type LLMProvider } from '@karyakram/llm';
 import type { AnyWorkflowDefinition } from '../src/authoring';
 import { createLlmCallHandler } from '../src/llmHandler';
+import { createToolCallHandler } from '../src/toolHandler';
+import type { ToolRegistry } from '../src/tools';
 import type { LlmStepConfig } from '../src/llmConfig';
 import { Reaper } from '../src/reaper';
 import { createWorkflowReplayHandler } from '../src/workflowReplayHandler';
@@ -44,6 +46,8 @@ export interface ClusterOptions {
   heartbeatIntervalMs?: number;
   pollIntervalMs?: number;
   reaperIntervalMs?: number;
+  /** If set, also runs a `tool` worker over this registry. */
+  registry?: ToolRegistry;
   /** Skip the llm worker (to inspect a freshly requested step by hand). */
   withoutLlmWorker?: boolean;
 }
@@ -81,6 +85,15 @@ export function startCluster(pool: Pool, options: ClusterOptions): Cluster {
           workflows: options.workflows,
           ...(options.llmConfig ? { config: options.llmConfig } : {}),
         }),
+      ),
+    );
+  }
+  if (options.registry) {
+    workers.push(
+      new Worker(
+        pool,
+        { ...common, workerId: 'tool-worker', taskType: 'tool' },
+        createToolCallHandler(pool, { registry: options.registry }),
       ),
     );
   }
