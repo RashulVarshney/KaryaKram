@@ -17,6 +17,7 @@
   "dependencies": {
     "@karyakram/core": "workspace:*",
     "@karyakram/db": "workspace:*",
+    "@karyakram/llm": "workspace:*",
     "@karyakram/observability": "workspace:*",
     "@opentelemetry/api": "^1.9.1",
     "pg": "^8.23.0",

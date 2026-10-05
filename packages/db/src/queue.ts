@@ -8,7 +8,7 @@ import { computeRetryDelaySeconds } from './backoff';
  */
 export type Queryable = Pool | PoolClient;
 
-export type TaskType = 'workflow' | 'activity' | 'timer';
+export type TaskType = 'workflow' | 'activity' | 'timer' | 'llm' | 'tool';
 export type TaskStatus = 'pending' | 'leased' | 'completed' | 'dead';
 
 export interface Task {
@@ -276,6 +276,13 @@ export interface FailInput {
   error: string;
   /** The task's current attempt count (from the `Task` returned by `dequeue`) — used to compute jittered backoff. */
   attempt: number;
+  /**
+   * Lower bound for the retry delay, e.g. a provider's `Retry-After`. The
+   * delay used is `max(jittered backoff, minDelaySeconds)`: backoff
+   * spreads retries out, but we must never retry *sooner* than a rate
+   * limiter asked us to.
+   */
+  minDelaySeconds?: number;
 }
 
 /**
@@ -285,8 +292,8 @@ export interface FailInput {
  * the same way `complete` is.
  */
 export async function fail(client: Queryable, input: FailInput): Promise<boolean> {
-  const { taskId, workerId, error, attempt } = input;
-  const delaySeconds = computeRetryDelaySeconds(attempt);
+  const { taskId, workerId, error, attempt, minDelaySeconds = 0 } = input;
+  const delaySeconds = Math.max(computeRetryDelaySeconds(attempt), minDelaySeconds);
 
   const result = await client.query(
     `UPDATE tasks
@@ -356,4 +363,31 @@ export async function getQueueDepth(client: Queryable): Promise<Record<TaskStatu
     depth[row.status] = Number(row.count);
   }
   return depth;
+}
+
+export interface LeaseFence {
+  taskId: string;
+  workerId: string;
+  /** The `attempt` this worker was handed by `dequeue` — each lease gets a new one. */
+  attempt: number;
+}
+
+/**
+ * Fencing check for writes that must only happen while this worker still
+ * owns the task. Call it *inside* the transaction that does the write: it
+ * takes a row lock on the task (`FOR UPDATE`), so the reaper's
+ * `SKIP LOCKED` reclaim can't take the lease away between the check and
+ * the commit, and a worker that already lost its lease (reclaimed, maybe
+ * re-leased) gets `false` and must discard its result. Matching `attempt`
+ * as well as `leased_by` is what makes it a fencing *token*: if the same
+ * worker id re-leases the task, the older invocation still fails the check.
+ */
+export async function isLeaseOwned(client: Queryable, fence: LeaseFence): Promise<boolean> {
+  const result = await client.query(
+    `SELECT 1 FROM tasks
+      WHERE id = $1 AND status = 'leased' AND leased_by = $2 AND attempt = $3
+      FOR UPDATE`,
+    [fence.taskId, fence.workerId, fence.attempt],
+  );
+  return (result.rowCount ?? 0) > 0;
 }

@@ -37,3 +37,19 @@ export {
   getActivityExecutionCount,
 } from './examples/reserveChargeShip';
 export type { OrderInput, OrderResult } from './examples/reserveChargeShip';
+
+export { createLlmCallHandler } from './llmHandler';
+export type { LlmCallHandlerOptions } from './llmHandler';
+export {
+  loadLlmStepConfig,
+  redactSecrets,
+  truncateUtf8,
+  buildStoredRequest,
+  capResponse,
+  DEFAULT_MAX_STORED_BYTES,
+  DEFAULT_LLM_MAX_ATTEMPTS,
+} from './llmConfig';
+export type { LlmStepConfig, StoredRequest, CappedResponse } from './llmConfig';
+export { LeaseLostError, appendStepOutcome, assertLeaseOwned, hasStepOutcome } from './fencing';
+export { maybeFault, armRandomDelayFault } from './faults';
+export type { FaultPoint } from './faults';

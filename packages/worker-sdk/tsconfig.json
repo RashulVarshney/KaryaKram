@@ -4,6 +4,21 @@
     "outDir": "dist",
     "rootDir": "src"
   },
-  "include": ["src"],
-  "references": [{ "path": "../core" }, { "path": "../db" }, { "path": "../observability" }]
+  "include": [
+    "src"
+  ],
+  "references": [
+    {
+      "path": "../core"
+    },
+    {
+      "path": "../db"
+    },
+    {
+      "path": "../observability"
+    },
+    {
+      "path": "../llm"
+    }
+  ]
 }

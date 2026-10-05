@@ -219,6 +219,9 @@ importers:
       '@karyakram/db':
         specifier: workspace:*
         version: link:../db
+      '@karyakram/llm':
+        specifier: workspace:*
+        version: link:../llm
       '@karyakram/observability':
         specifier: workspace:*
         version: link:../observability

@@ -3,14 +3,17 @@ import pino, { type Logger } from 'pino';
 import {
   NonDeterminismError,
   replay,
+  StepRequestMismatchError,
   type WorkflowCommand,
   type WorkflowEventPayload,
 } from '@karyakram/core';
+import { sha256Hex } from '@karyakram/llm';
 import { appendEvents, getEvents, withTransaction, type Task } from '@karyakram/db';
 import type { AnyWorkflowDefinition } from './authoring';
+import { buildStoredRequest, loadLlmStepConfig, type LlmStepConfig } from './llmConfig';
 import type { TaskHandler } from './worker';
 
-function commandToEvent(command: WorkflowCommand): WorkflowEventPayload {
+function commandToEvent(command: WorkflowCommand, llm: LlmStepConfig): WorkflowEventPayload {
   switch (command.type) {
     case 'ScheduleActivity':
       return {
@@ -22,6 +25,17 @@ function commandToEvent(command: WorkflowCommand): WorkflowEventPayload {
       return { type: 'WorkflowCompleted', result: command.result };
     case 'FailWorkflow':
       return { type: 'WorkflowFailed', error: command.error };
+    case 'RequestLlmCall': {
+      const stored = buildStoredRequest(command.request, llm);
+      return {
+        type: 'LLM_REQUESTED',
+        stepId: command.stepId,
+        requestHash: command.requestHash,
+        requestStorage: stored.requestStorage,
+        ...(stored.request ? { request: stored.request } : {}),
+        maxAttempts: llm.maxAttempts,
+      };
+    }
     case 'ScheduleTimer':
       // The one place `Date.now()` is allowed to enter this whole flow:
       // `replay()` (packages/core) only ever deals in the *duration* the
@@ -45,8 +59,10 @@ export function createWorkflowReplayHandler(
   pool: Pool,
   workflows: AnyWorkflowDefinition[],
   logger: Logger = pino({ level: process.env['LOG_LEVEL'] ?? 'info' }),
+  options: { llm?: LlmStepConfig } = {},
 ): TaskHandler {
   const registry = new Map(workflows.map((w) => [w.workflowType, w]));
+  const llmConfig = options.llm ?? loadLlmStepConfig();
 
   return async (task: Task) => {
     const history = await getEvents(pool, task.workflowId);
@@ -88,8 +104,24 @@ export function createWorkflowReplayHandler(
 
     let result;
     try {
-      result = await replay(definition.fn, input, history);
+      result = await replay(definition.fn, input, history, { hash: sha256Hex });
     } catch (err) {
+      if (err instanceof StepRequestMismatchError) {
+        // A durable step's request changed under an in-flight workflow.
+        // Fail the workflow with the reason instead of retrying (a retry
+        // can't fix a code change) or silently re-calling the provider.
+        logger.error(
+          { err, workflowId: task.workflowId, workflowType },
+          'durable step request changed — failing workflow',
+        );
+        await withTransaction(pool, (client) =>
+          appendEvents(client, {
+            workflowId: task.workflowId,
+            events: [{ type: 'WorkflowFailed', error: err.message }],
+          }),
+        );
+        return;
+      }
       if (err instanceof NonDeterminismError) {
         // Deliberately not turned into a WorkflowFailed event — see
         // docs/03-replay.md. This propagates out of the handler, so M1's
@@ -108,7 +140,7 @@ export function createWorkflowReplayHandler(
       return;
     }
 
-    const events = result.commands.map(commandToEvent);
+    const events = result.commands.map((c) => commandToEvent(c, llmConfig));
     await withTransaction(pool, (client) =>
       appendEvents(client, { workflowId: task.workflowId, events }),
     );

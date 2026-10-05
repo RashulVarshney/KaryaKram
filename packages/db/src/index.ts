@@ -9,6 +9,7 @@ export {
   fail,
   reclaimExpired,
   getQueueDepth,
+  isLeaseOwned,
 } from './queue';
 export type {
   Queryable,
@@ -21,6 +22,7 @@ export type {
   CompleteInput,
   FailInput,
   ReclaimExpiredInput,
+  LeaseFence,
 } from './queue';
 
 export { withTransaction } from './transaction';

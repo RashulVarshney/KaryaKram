@@ -1,0 +1,258 @@
+$ pnpm run test:unit && pnpm run test:integration
+$ vitest run --project unit
+
+ RUN  v4.1.10 /home/rashul/Downloads/VSCode/KaryaKram
+
+
+ Test Files  14 passed (14)
+      Tests  103 passed (103)
+   Start at  21:30:04
+   Duration  947ms (transform 1.39s, setup 0ms, import 3.05s, tests 309ms, environment 3ms)
+
+$ vitest run --project integration
+
+ RUN  v4.1.10 /home/rashul/Downloads/VSCode/KaryaKram
+
+{"level":30,"time":1791216011836,"pid":57080,"hostname":"Rashul-pc","component":"leader-election","leaderId":"replica-a","msg":"leader election starting"}
+{"level":30,"time":1791216011839,"pid":57080,"hostname":"Rashul-pc","component":"leader-election","leaderId":"replica-b","msg":"leader election starting"}
+{"level":30,"time":1791216011866,"pid":57080,"hostname":"Rashul-pc","component":"leader-election","leaderId":"replica-b","msg":"acquired leadership"}
+{"level":30,"time":1791216012079,"pid":57080,"hostname":"Rashul-pc","component":"leader-election","leaderId":"replica-a","msg":"leader election stopped"}
+{"level":30,"time":1791216012084,"pid":57080,"hostname":"Rashul-pc","component":"leader-election","leaderId":"replica-b","msg":"leader election stopped"}
+{"level":30,"time":1791216012143,"pid":57080,"hostname":"Rashul-pc","component":"leader-election","leaderId":"replica-a","msg":"leader election starting"}
+{"level":30,"time":1791216012167,"pid":57080,"hostname":"Rashul-pc","component":"leader-election","leaderId":"replica-a","msg":"acquired leadership"}
+{"level":30,"time":1791216012186,"pid":57080,"hostname":"Rashul-pc","component":"leader-election","leaderId":"replica-a","msg":"leader election stopped"}
+{"level":30,"time":1791216012258,"pid":57080,"hostname":"Rashul-pc","component":"leader-election","leaderId":"replica-a","msg":"leader election starting"}
+{"level":30,"time":1791216012260,"pid":57080,"hostname":"Rashul-pc","component":"leader-election","leaderId":"replica-b","msg":"leader election starting"}
+{"level":30,"time":1791216012280,"pid":57080,"hostname":"Rashul-pc","component":"leader-election","leaderId":"replica-b","msg":"acquired leadership"}
+{"level":30,"time":1791216012295,"pid":57080,"hostname":"Rashul-pc","component":"leader-election","leaderId":"replica-b","msg":"leader election stopped"}
+{"level":30,"time":1791216012334,"pid":57080,"hostname":"Rashul-pc","component":"leader-election","leaderId":"replica-a","msg":"acquired leadership"}
+{"level":30,"time":1791216012349,"pid":57080,"hostname":"Rashul-pc","component":"leader-election","leaderId":"replica-b","msg":"leader election stopped"}
+{"level":30,"time":1791216012349,"pid":57080,"hostname":"Rashul-pc","component":"leader-election","leaderId":"replica-a","msg":"leader election stopped"}
+{"level":30,"time":1791216016294,"pid":57079,"hostname":"Rashul-pc","workerId":"Rashul-pc-57079-1d6750","config":{"workerId":"Rashul-pc-57079-1d6750","queue":"default","pollIntervalMs":50,"maxPollIntervalMs":2000,"leaseSeconds":30,"heartbeatIntervalMs":10000,"maxConcurrency":1,"drainTimeoutMs":30000,"notifyConnectionString":"postgres://test:test@localhost:32804/test"},"msg":"worker starting"}
+{"level":30,"time":1791216016314,"pid":57079,"hostname":"Rashul-pc","workerId":"Rashul-pc-57079-1d6750","msg":"listening for tasks_available notifications"}
+{"level":30,"time":1791216017042,"pid":57079,"hostname":"Rashul-pc","workerId":"Rashul-pc-57079-1d6750","taskId":"1","msg":"task completed"}
+{"level":30,"time":1791216017050,"pid":57079,"hostname":"Rashul-pc","workerId":"Rashul-pc-57079-1d6750","msg":"worker stopping — draining in-flight tasks"}
+{"level":30,"time":1791216017058,"pid":57079,"hostname":"Rashul-pc","workerId":"Rashul-pc-57079-1d6750","msg":"worker stopped"}
+{"level":30,"time":1791216017328,"pid":57079,"hostname":"Rashul-pc","workerId":"Rashul-pc-57079-bd34a8","config":{"workerId":"Rashul-pc-57079-bd34a8","queue":"default","pollIntervalMs":20,"maxPollIntervalMs":200,"leaseSeconds":30,"heartbeatIntervalMs":10000,"maxConcurrency":1,"drainTimeoutMs":30000},"msg":"worker starting"}
+{"level":30,"time":1791216017433,"pid":57079,"hostname":"Rashul-pc","workerId":"Rashul-pc-57079-bd34a8","taskId":"1","msg":"task completed"}
+{"level":30,"time":1791216017436,"pid":57079,"hostname":"Rashul-pc","workerId":"Rashul-pc-57079-bd34a8","msg":"worker stopping — draining in-flight tasks"}
+{"level":30,"time":1791216017436,"pid":57079,"hostname":"Rashul-pc","workerId":"Rashul-pc-57079-bd34a8","msg":"worker stopped"}
+{"level":30,"time":1791216017469,"pid":57022,"hostname":"Rashul-pc","workerId":"wf-worker","config":{"workerId":"wf-worker","queue":"default","taskType":"workflow","pollIntervalMs":20,"maxPollIntervalMs":2000,"leaseSeconds":10,"heartbeatIntervalMs":2000,"maxConcurrency":5,"drainTimeoutMs":30000},"msg":"worker starting"}
+{"level":30,"time":1791216017470,"pid":57022,"hostname":"Rashul-pc","workerId":"llm-worker","config":{"workerId":"llm-worker","queue":"default","taskType":"llm","pollIntervalMs":20,"maxPollIntervalMs":2000,"leaseSeconds":10,"heartbeatIntervalMs":2000,"maxConcurrency":5,"drainTimeoutMs":30000},"msg":"worker starting"}
+{"level":30,"time":1791216017634,"pid":57022,"hostname":"Rashul-pc","workerId":"wf-worker","taskId":"1","msg":"task completed"}
+{"level":30,"time":1791216017812,"pid":57022,"hostname":"Rashul-pc","workerId":"llm-worker","taskId":"2","msg":"task completed"}
+{"level":30,"time":1791216017988,"pid":57022,"hostname":"Rashul-pc","workerId":"wf-worker","taskId":"4","msg":"task completed"}
+{"level":30,"time":1791216018103,"pid":57022,"hostname":"Rashul-pc","workerId":"llm-worker","taskId":"6","msg":"task completed"}
+{"level":30,"time":1791216018151,"pid":57022,"hostname":"Rashul-pc","workerId":"wf-worker","taskId":"8","msg":"task completed"}
+{"level":30,"time":1791216018181,"pid":57022,"hostname":"Rashul-pc","workerId":"wf-worker","msg":"worker stopping — draining in-flight tasks"}
+{"level":30,"time":1791216018184,"pid":57022,"hostname":"Rashul-pc","workerId":"llm-worker","msg":"worker stopping — draining in-flight tasks"}
+{"level":30,"time":1791216018183,"pid":57022,"hostname":"Rashul-pc","workerId":"wf-worker","msg":"worker stopped"}
+{"level":30,"time":1791216018185,"pid":57022,"hostname":"Rashul-pc","workerId":"llm-worker","msg":"worker stopped"}
+{"level":30,"time":1791216018248,"pid":57022,"hostname":"Rashul-pc","workerId":"wf-worker","config":{"workerId":"wf-worker","queue":"default","taskType":"workflow","pollIntervalMs":20,"maxPollIntervalMs":2000,"leaseSeconds":10,"heartbeatIntervalMs":2000,"maxConcurrency":5,"drainTimeoutMs":30000},"msg":"worker starting"}
+{"level":30,"time":1791216018249,"pid":57022,"hostname":"Rashul-pc","workerId":"llm-worker","config":{"workerId":"llm-worker","queue":"default","taskType":"llm","pollIntervalMs":20,"maxPollIntervalMs":2000,"leaseSeconds":10,"heartbeatIntervalMs":2000,"maxConcurrency":5,"drainTimeoutMs":30000},"msg":"worker starting"}
+{"level":30,"time":1791216018320,"pid":57022,"hostname":"Rashul-pc","workerId":"wf-worker","taskId":"1","msg":"task completed"}
+{"level":30,"time":1791216018410,"pid":57022,"hostname":"Rashul-pc","workerId":"llm-worker","taskId":"2","msg":"task completed"}
+{"level":30,"time":1791216018470,"pid":57022,"hostname":"Rashul-pc","workerId":"wf-worker","taskId":"4","msg":"task completed"}
+{"level":30,"time":1791216018556,"pid":57022,"hostname":"Rashul-pc","workerId":"wf-worker","taskId":"6","msg":"task completed"}
+{"level":30,"time":1791216018723,"pid":57022,"hostname":"Rashul-pc","workerId":"wf-worker","taskId":"7","msg":"task completed"}
+{"level":30,"time":1791216018780,"pid":57022,"hostname":"Rashul-pc","workerId":"wf-worker","taskId":"8","msg":"task completed"}
+{"level":30,"time":1791216019006,"pid":57022,"hostname":"Rashul-pc","workerId":"wf-worker","taskId":"9","msg":"task completed"}
+{"level":30,"time":1791216018979,"pid":63481,"hostname":"Rashul-pc","workerId":"Rashul-pc-63481-e64a98","config":{"workerId":"Rashul-pc-63481-e64a98","queue":"default","pollIntervalMs":20,"maxPollIntervalMs":200,"leaseSeconds":30,"heartbeatIntervalMs":10000,"maxConcurrency":1,"drainTimeoutMs":30000},"msg":"worker starting"}
+{"level":30,"time":1791216019067,"pid":63481,"hostname":"Rashul-pc","workerId":"Rashul-pc-63481-e64a98","taskId":"1","msg":"task completed"}
+{"level":40,"time":1791216019090,"pid":63481,"hostname":"Rashul-pc","workerId":"Rashul-pc-63481-e64a98","taskId":"2","err":{"type":"Error","message":"forced failure for the metrics test","stack":"Error: forced failure for the metrics test\n    at Worker.__vite_ssr_import_7__.Worker.tracer.tracer [as handler] (/home/rashul/Downloads/VSCode/KaryaKram/packages/worker-sdk/test/metrics.integration.test.ts:67:36)\n    at /home/rashul/Downloads/VSCode/KaryaKram/packages/worker-sdk/src/worker.ts:149:84\n    at /home/rashul/Downloads/VSCode/KaryaKram/packages/observability/dist/tracing.js:62:26\n    at NoopContextManager.with (/home/rashul/Downloads/VSCode/KaryaKram/node_modules/.pnpm/@opentelemetry+api@1.9.1/node_modules/@opentelemetry/api/build/src/context/NoopContextManager.js:14:19)\n    at ContextAPI.with (/home/rashul/Downloads/VSCode/KaryaKram/node_modules/.pnpm/@opentelemetry+api@1.9.1/node_modules/@opentelemetry/api/build/src/api/context.js:51:46)\n    at NoopTracer.startActiveSpan (/home/rashul/Downloads/VSCode/KaryaKram/node_modules/.pnpm/@opentelemetry+api@1.9.1/node_modules/@opentelemetry/api/build/src/trace/NoopTracer.js:54:31)\n    at ProxyTracer.startActiveSpan (/home/rashul/Downloads/VSCode/KaryaKram/node_modules/.pnpm/@opentelemetry+api@1.9.1/node_modules/@opentelemetry/api/build/src/trace/ProxyTracer.js:27:24)\n    at /home/rashul/Downloads/VSCode/KaryaKram/packages/observability/dist/tracing.js:60:59\n    at NoopContextManager.with (/home/rashul/Downloads/VSCode/KaryaKram/node_modules/.pnpm/@opentelemetry+api@1.9.1/node_modules/@opentelemetry/api/build/src/context/NoopContextManager.js:14:19)\n    at ContextAPI.with (/home/rashul/Downloads/VSCode/KaryaKram/node_modules/.pnpm/@opentelemetry+api@1.9.1/node_modules/@opentelemetry/api/build/src/api/context.js:51:46)"},"msg":"task failed"}
+{"level":30,"time":1791216019160,"pid":63481,"hostname":"Rashul-pc","workerId":"Rashul-pc-63481-e64a98","taskId":"2","msg":"task completed"}
+{"level":30,"time":1791216019170,"pid":57022,"hostname":"Rashul-pc","workerId":"wf-worker","taskId":"10","msg":"task completed"}
+{"level":30,"time":1791216019256,"pid":63481,"hostname":"Rashul-pc","workerId":"Rashul-pc-63481-e64a98","msg":"worker stopping — draining in-flight tasks"}
+{"level":30,"time":1791216019256,"pid":63481,"hostname":"Rashul-pc","workerId":"Rashul-pc-63481-e64a98","msg":"worker stopped"}
+{"level":30,"time":1791216019726,"pid":57022,"hostname":"Rashul-pc","workerId":"llm-worker","taskId":"11","msg":"task completed"}
+{"level":30,"time":1791216019897,"pid":57022,"hostname":"Rashul-pc","workerId":"wf-worker","taskId":"13","msg":"task completed"}
+ ❯ |integration| packages/worker-sdk/test/metrics.integration.test.ts (1 test | 1 failed) 5569ms
+     × increments dequeued/completed on success and failed on a thrown handler 412ms
+{"level":30,"time":1791216019918,"pid":57022,"hostname":"Rashul-pc","workerId":"wf-worker","msg":"worker stopping — draining in-flight tasks"}
+{"level":30,"time":1791216019918,"pid":57022,"hostname":"Rashul-pc","workerId":"llm-worker","msg":"worker stopping — draining in-flight tasks"}
+{"level":30,"time":1791216019918,"pid":57022,"hostname":"Rashul-pc","workerId":"wf-worker","msg":"worker stopped"}
+{"level":30,"time":1791216019920,"pid":57022,"hostname":"Rashul-pc","workerId":"llm-worker","msg":"worker stopped"}
+{"level":30,"time":1791216019984,"pid":57022,"hostname":"Rashul-pc","workerId":"wf-worker","config":{"workerId":"wf-worker","queue":"default","taskType":"workflow","pollIntervalMs":20,"maxPollIntervalMs":2000,"leaseSeconds":10,"heartbeatIntervalMs":2000,"maxConcurrency":5,"drainTimeoutMs":30000},"msg":"worker starting"}
+{"level":30,"time":1791216019984,"pid":57022,"hostname":"Rashul-pc","workerId":"llm-worker","config":{"workerId":"llm-worker","queue":"default","taskType":"llm","pollIntervalMs":20,"maxPollIntervalMs":2000,"leaseSeconds":10,"heartbeatIntervalMs":2000,"maxConcurrency":5,"drainTimeoutMs":30000},"msg":"worker starting"}
+{"level":30,"time":1791216020051,"pid":57022,"hostname":"Rashul-pc","workerId":"wf-worker","taskId":"1","msg":"task completed"}
+{"level":30,"time":1791216020150,"pid":57022,"hostname":"Rashul-pc","workerId":"llm-worker","taskId":"2","msg":"task completed"}
+{"level":30,"time":1791216020159,"pid":57022,"hostname":"Rashul-pc","workerId":"wf-worker","msg":"worker stopping — draining in-flight tasks"}
+{"level":30,"time":1791216020193,"pid":57022,"hostname":"Rashul-pc","workerId":"wf-worker","config":{"workerId":"wf-worker","queue":"default","taskType":"workflow","pollIntervalMs":20,"maxPollIntervalMs":2000,"leaseSeconds":10,"heartbeatIntervalMs":2000,"maxConcurrency":5,"drainTimeoutMs":30000},"msg":"worker starting"}
+{"level":30,"time":1791216020192,"pid":57022,"hostname":"Rashul-pc","workerId":"llm-worker","msg":"worker stopping — draining in-flight tasks"}
+{"level":30,"time":1791216020192,"pid":57022,"hostname":"Rashul-pc","workerId":"llm-worker","msg":"worker stopped"}
+{"level":30,"time":1791216020196,"pid":57022,"hostname":"Rashul-pc","workerId":"llm-worker","config":{"workerId":"llm-worker","queue":"default","taskType":"llm","pollIntervalMs":20,"maxPollIntervalMs":2000,"leaseSeconds":10,"heartbeatIntervalMs":2000,"maxConcurrency":5,"drainTimeoutMs":30000},"msg":"worker starting"}
+{"level":30,"time":1791216020192,"pid":57022,"hostname":"Rashul-pc","workerId":"wf-worker","msg":"worker stopped"}
+{"level":50,"time":1791216020207,"pid":57022,"hostname":"Rashul-pc","err":{"type":"StepRequestMismatchError","message":"Non-deterministic workflow: step \"llm-0\" was recorded with request hash 71faf153f35f, but the running code now produces 1e9cf67b6bf9. The model, prompt, params or tool definitions changed since this step was requested; refusing to silently re-call the provider.","stack":"StepRequestMismatchError: Non-deterministic workflow: step \"llm-0\" was recorded with request hash 71faf153f35f, but the running code now produces 1e9cf67b6bf9. The model, prompt, params or tool definitions changed since this step was requested; refusing to silently re-call the provider.\n    at Object.llmCall (/home/rashul/Downloads/VSCode/KaryaKram/packages/core/dist/replay.js:173:43)\n    at /home/rashul/Downloads/VSCode/KaryaKram/packages/worker-sdk/test/llmCall.integration.test.ts:137:27\n    at replay (/home/rashul/Downloads/VSCode/KaryaKram/packages/core/dist/replay.js:224:5)\n    at Worker.handler (/home/rashul/Downloads/VSCode/KaryaKram/packages/worker-sdk/src/workflowReplayHandler.ts:107:22)\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at runHandler (/home/rashul/Downloads/VSCode/KaryaKram/packages/worker-sdk/src/worker.ts:144:9)\n    at /home/rashul/Downloads/VSCode/KaryaKram/packages/worker-sdk/src/worker.ts:154:9","callIndex":0,"expectedActivityType":"71faf153f35fc9b1401caa1798f5eac19288b01e68aa554cc4e2f38107f26fbe","actualActivityType":"1e9cf67b6bf9a8152f22e754150f66a7073cea8662aa870d86d1c9c8c3b6ccc5","name":"StepRequestMismatchError","stepId":"llm-0","expectedHash":"71faf153f35fc9b1401caa1798f5eac19288b01e68aa554cc4e2f38107f26fbe","actualHash":"1e9cf67b6bf9a8152f22e754150f66a7073cea8662aa870d86d1c9c8c3b6ccc5"},"workflowId":"0c70d22a-aa99-4357-9761-076792da9c97","workflowType":"wf-drift","msg":"durable step request changed — failing workflow"}
+{"level":30,"time":1791216020252,"pid":57022,"hostname":"Rashul-pc","workerId":"wf-worker","taskId":"4","msg":"task completed"}
+{"level":30,"time":1791216020253,"pid":63933,"hostname":"Rashul-pc","workerId":"workflow-1","config":{"workerId":"workflow-1","queue":"default","taskType":"workflow","pollIntervalMs":20,"maxPollIntervalMs":2000,"leaseSeconds":10,"heartbeatIntervalMs":2000,"maxConcurrency":5,"drainTimeoutMs":30000},"msg":"worker starting"}
+{"level":30,"time":1791216020269,"pid":63933,"hostname":"Rashul-pc","workerId":"workflow-1","taskId":"1","msg":"task completed"}
+{"level":30,"time":1791216020274,"pid":57022,"hostname":"Rashul-pc","workerId":"wf-worker","msg":"worker stopping — draining in-flight tasks"}
+{"level":30,"time":1791216020274,"pid":57022,"hostname":"Rashul-pc","workerId":"llm-worker","msg":"worker stopping — draining in-flight tasks"}
+{"level":30,"time":1791216020274,"pid":57022,"hostname":"Rashul-pc","workerId":"wf-worker","msg":"worker stopped"}
+{"level":30,"time":1791216020274,"pid":57022,"hostname":"Rashul-pc","workerId":"llm-worker","msg":"worker stopped"}
+{"level":30,"time":1791216020339,"pid":63848,"hostname":"Rashul-pc","component":"scheduler","leaderId":"replica-a","msg":"scheduler starting"}
+{"level":30,"time":1791216020341,"pid":63848,"hostname":"Rashul-pc","component":"scheduler","leaderId":"replica-b","msg":"scheduler starting"}
+{"level":30,"time":1791216020342,"pid":57022,"hostname":"Rashul-pc","workerId":"wf-worker","config":{"workerId":"wf-worker","queue":"default","taskType":"workflow","pollIntervalMs":20,"maxPollIntervalMs":2000,"leaseSeconds":10,"heartbeatIntervalMs":2000,"maxConcurrency":5,"drainTimeoutMs":30000},"msg":"worker starting"}
+{"level":30,"time":1791216020343,"pid":57022,"hostname":"Rashul-pc","workerId":"llm-worker","config":{"workerId":"llm-worker","queue":"default","taskType":"llm","pollIntervalMs":20,"maxPollIntervalMs":2000,"leaseSeconds":10,"heartbeatIntervalMs":2000,"maxConcurrency":5,"drainTimeoutMs":30000},"msg":"worker starting"}
+{"level":30,"time":1791216020340,"pid":63848,"hostname":"Rashul-pc","component":"leader-election","leaderId":"replica-a","msg":"leader election starting"}
+{"level":30,"time":1791216020341,"pid":63848,"hostname":"Rashul-pc","component":"leader-election","leaderId":"replica-b","msg":"leader election starting"}
+{"level":30,"time":1791216020358,"pid":63848,"hostname":"Rashul-pc","component":"leader-election","leaderId":"replica-b","msg":"acquired leadership"}
+{"level":30,"time":1791216020364,"pid":63848,"hostname":"Rashul-pc","component":"reaper","intervalMs":50,"msg":"reaper starting"}
+{"level":30,"time":1791216020422,"pid":63848,"hostname":"Rashul-pc","component":"reaper","count":1,"taskIds":["1"],"msg":"reclaimed expired leases"}
+{"level":30,"time":1791216020428,"pid":57022,"hostname":"Rashul-pc","workerId":"wf-worker","taskId":"1","msg":"task completed"}
+{"level":40,"time":1791216020491,"pid":57022,"hostname":"Rashul-pc","taskId":"2","stepId":"llm-0","attempt":1,"code":"invalid_request","msg":"provider call failed"}
+{"level":30,"time":1791216020528,"pid":57022,"hostname":"Rashul-pc","workerId":"llm-worker","taskId":"2","msg":"task completed"}
+{"level":30,"time":1791216020603,"pid":57022,"hostname":"Rashul-pc","workerId":"wf-worker","taskId":"4","msg":"task completed"}
+{"level":30,"time":1791216020629,"pid":57022,"hostname":"Rashul-pc","workerId":"wf-worker","msg":"worker stopping — draining in-flight tasks"}
+{"level":30,"time":1791216020629,"pid":57022,"hostname":"Rashul-pc","workerId":"llm-worker","msg":"worker stopping — draining in-flight tasks"}
+{"level":30,"time":1791216020629,"pid":57022,"hostname":"Rashul-pc","workerId":"wf-worker","msg":"worker stopped"}
+{"level":30,"time":1791216020629,"pid":57022,"hostname":"Rashul-pc","workerId":"llm-worker","msg":"worker stopped"}
+{"level":30,"time":1791216020635,"pid":63933,"hostname":"Rashul-pc","workerId":"workflow-1","taskId":"2","msg":"task completed"}
+{"level":30,"time":1791216020666,"pid":63933,"hostname":"Rashul-pc","workerId":"workflow-1","msg":"worker stopping — draining in-flight tasks"}
+{"level":30,"time":1791216020667,"pid":63933,"hostname":"Rashul-pc","workerId":"workflow-1","msg":"worker stopped"}
+{"level":30,"time":1791216020693,"pid":57022,"hostname":"Rashul-pc","workerId":"wf-worker","config":{"workerId":"wf-worker","queue":"default","taskType":"workflow","pollIntervalMs":20,"maxPollIntervalMs":2000,"leaseSeconds":10,"heartbeatIntervalMs":2000,"maxConcurrency":5,"drainTimeoutMs":30000},"msg":"worker starting"}
+{"level":30,"time":1791216020753,"pid":63848,"hostname":"Rashul-pc","component":"leader-election","leaderId":"replica-a","msg":"leader election stopped"}
+{"level":30,"time":1791216020755,"pid":63848,"hostname":"Rashul-pc","component":"reaper","msg":"reaper stopped"}
+{"level":30,"time":1791216020754,"pid":63848,"hostname":"Rashul-pc","component":"scheduler","leaderId":"replica-a","msg":"scheduler stopped"}
+{"level":30,"time":1791216020756,"pid":63848,"hostname":"Rashul-pc","component":"leader-election","leaderId":"replica-b","msg":"leader election stopped"}
+{"level":30,"time":1791216020756,"pid":63848,"hostname":"Rashul-pc","component":"scheduler","leaderId":"replica-b","msg":"scheduler stopped"}
+{"level":30,"time":1791216020766,"pid":57022,"hostname":"Rashul-pc","workerId":"wf-worker","taskId":"1","msg":"task completed"}
+{"level":30,"time":1791216020791,"pid":57022,"hostname":"Rashul-pc","workerId":"wf-worker","msg":"worker stopping — draining in-flight tasks"}
+{"level":30,"time":1791216020791,"pid":57022,"hostname":"Rashul-pc","workerId":"wf-worker","msg":"worker stopped"}
+{"level":30,"time":1791216020822,"pid":63848,"hostname":"Rashul-pc","component":"scheduler","leaderId":"replica-a","msg":"scheduler starting"}
+{"level":30,"time":1791216020824,"pid":63848,"hostname":"Rashul-pc","component":"scheduler","leaderId":"replica-b","msg":"scheduler starting"}
+{"level":30,"time":1791216020822,"pid":63848,"hostname":"Rashul-pc","component":"leader-election","leaderId":"replica-a","msg":"leader election starting"}
+{"level":30,"time":1791216020824,"pid":63848,"hostname":"Rashul-pc","component":"leader-election","leaderId":"replica-b","msg":"leader election starting"}
+{"level":30,"time":1791216020872,"pid":63848,"hostname":"Rashul-pc","component":"leader-election","leaderId":"replica-a","msg":"acquired leadership"}
+{"level":30,"time":1791216020874,"pid":57022,"hostname":"Rashul-pc","workerId":"wf-worker","config":{"workerId":"wf-worker","queue":"default","taskType":"workflow","pollIntervalMs":20,"maxPollIntervalMs":2000,"leaseSeconds":10,"heartbeatIntervalMs":2000,"maxConcurrency":5,"drainTimeoutMs":30000},"msg":"worker starting"}
+{"level":30,"time":1791216020878,"pid":63848,"hostname":"Rashul-pc","component":"reaper","intervalMs":50,"msg":"reaper starting"}
+{"level":30,"time":1791216020894,"pid":63848,"hostname":"Rashul-pc","component":"reaper","msg":"reaper stopped"}
+{"level":30,"time":1791216020894,"pid":63848,"hostname":"Rashul-pc","component":"leader-election","leaderId":"replica-a","msg":"leader election stopped"}
+{"level":30,"time":1791216020894,"pid":63848,"hostname":"Rashul-pc","component":"scheduler","leaderId":"replica-a","msg":"scheduler stopped"}
+{"level":30,"time":1791216020920,"pid":63848,"hostname":"Rashul-pc","component":"leader-election","leaderId":"replica-b","msg":"acquired leadership"}
+{"level":30,"time":1791216020923,"pid":63848,"hostname":"Rashul-pc","component":"reaper","intervalMs":50,"msg":"reaper starting"}
+{"level":30,"time":1791216020980,"pid":63848,"hostname":"Rashul-pc","component":"reaper","count":1,"taskIds":["1"],"msg":"reclaimed expired leases"}
+{"level":30,"time":1791216020983,"pid":57022,"hostname":"Rashul-pc","workerId":"wf-worker","taskId":"1","msg":"task completed"}
+{"level":30,"time":1791216020995,"pid":63848,"hostname":"Rashul-pc","component":"leader-election","leaderId":"replica-a","msg":"leader election stopped"}
+{"level":30,"time":1791216020995,"pid":63848,"hostname":"Rashul-pc","component":"scheduler","leaderId":"replica-a","msg":"scheduler stopped"}
+{"level":30,"time":1791216020996,"pid":57022,"hostname":"Rashul-pc","workerId":"wf-worker","msg":"worker stopping — draining in-flight tasks"}
+{"level":30,"time":1791216020996,"pid":57022,"hostname":"Rashul-pc","workerId":"wf-worker","msg":"worker stopped"}
+{"level":30,"time":1791216021001,"pid":63848,"hostname":"Rashul-pc","component":"reaper","msg":"reaper stopped"}
+{"level":30,"time":1791216021001,"pid":63848,"hostname":"Rashul-pc","component":"leader-election","leaderId":"replica-b","msg":"leader election stopped"}
+{"level":30,"time":1791216021001,"pid":63848,"hostname":"Rashul-pc","component":"scheduler","leaderId":"replica-b","msg":"scheduler stopped"}
+{"level":30,"time":1791216021151,"pid":57022,"hostname":"Rashul-pc","workerId":"wf-worker","config":{"workerId":"wf-worker","queue":"default","taskType":"workflow","pollIntervalMs":20,"maxPollIntervalMs":2000,"leaseSeconds":2,"heartbeatIntervalMs":400,"maxConcurrency":5,"drainTimeoutMs":30000},"msg":"worker starting"}
+{"level":30,"time":1791216021151,"pid":57022,"hostname":"Rashul-pc","workerId":"llm-worker","config":{"workerId":"llm-worker","queue":"default","taskType":"llm","pollIntervalMs":20,"maxPollIntervalMs":2000,"leaseSeconds":2,"heartbeatIntervalMs":400,"maxConcurrency":5,"drainTimeoutMs":30000},"msg":"worker starting"}
+{"level":30,"time":1791216021152,"pid":57022,"hostname":"Rashul-pc","component":"reaper","intervalMs":100,"msg":"reaper starting"}
+{"level":30,"time":1791216021224,"pid":57022,"hostname":"Rashul-pc","workerId":"wf-worker","taskId":"1","msg":"task completed"}
+{"level":30,"time":1791216024868,"pid":57022,"hostname":"Rashul-pc","workerId":"llm-worker","taskId":"2","msg":"task completed"}
+{"level":30,"time":1791216025797,"pid":57022,"hostname":"Rashul-pc","workerId":"wf-worker","taskId":"4","msg":"task completed"}
+{"level":30,"time":1791216025814,"pid":57022,"hostname":"Rashul-pc","component":"reaper","msg":"reaper stopped"}
+{"level":30,"time":1791216025814,"pid":57022,"hostname":"Rashul-pc","workerId":"wf-worker","msg":"worker stopping — draining in-flight tasks"}
+{"level":30,"time":1791216025814,"pid":57022,"hostname":"Rashul-pc","workerId":"llm-worker","msg":"worker stopping — draining in-flight tasks"}
+{"level":30,"time":1791216025814,"pid":57022,"hostname":"Rashul-pc","workerId":"wf-worker","msg":"worker stopped"}
+{"level":30,"time":1791216025818,"pid":57022,"hostname":"Rashul-pc","workerId":"llm-worker","msg":"worker stopped"}
+{"level":30,"time":1791216025898,"pid":57022,"hostname":"Rashul-pc","workerId":"wf-worker","config":{"workerId":"wf-worker","queue":"default","taskType":"workflow","pollIntervalMs":20,"maxPollIntervalMs":2000,"leaseSeconds":10,"heartbeatIntervalMs":2000,"maxConcurrency":5,"drainTimeoutMs":30000},"msg":"worker starting"}
+{"level":30,"time":1791216025898,"pid":57022,"hostname":"Rashul-pc","workerId":"llm-worker","config":{"workerId":"llm-worker","queue":"default","taskType":"llm","pollIntervalMs":20,"maxPollIntervalMs":2000,"leaseSeconds":10,"heartbeatIntervalMs":2000,"maxConcurrency":5,"drainTimeoutMs":30000},"msg":"worker starting"}
+{"level":30,"time":1791216026006,"pid":57022,"hostname":"Rashul-pc","workerId":"wf-worker","taskId":"1","msg":"task completed"}
+{"level":30,"time":1791216026091,"pid":57022,"hostname":"Rashul-pc","workerId":"llm-worker","taskId":"2","msg":"task completed"}
+{"level":30,"time":1791216026193,"pid":57022,"hostname":"Rashul-pc","workerId":"wf-worker","taskId":"4","msg":"task completed"}
+{"level":30,"time":1791216026224,"pid":57022,"hostname":"Rashul-pc","workerId":"wf-worker","msg":"worker stopping — draining in-flight tasks"}
+{"level":30,"time":1791216026225,"pid":57022,"hostname":"Rashul-pc","workerId":"llm-worker","msg":"worker stopping — draining in-flight tasks"}
+{"level":30,"time":1791216026225,"pid":57022,"hostname":"Rashul-pc","workerId":"wf-worker","msg":"worker stopped"}
+{"level":30,"time":1791216026225,"pid":57022,"hostname":"Rashul-pc","workerId":"llm-worker","msg":"worker stopped"}
+{"level":30,"time":1791216026281,"pid":57022,"hostname":"Rashul-pc","workerId":"wf-worker","config":{"workerId":"wf-worker","queue":"default","taskType":"workflow","pollIntervalMs":20,"maxPollIntervalMs":2000,"leaseSeconds":10,"heartbeatIntervalMs":2000,"maxConcurrency":5,"drainTimeoutMs":30000},"msg":"worker starting"}
+{"level":30,"time":1791216026283,"pid":57022,"hostname":"Rashul-pc","workerId":"llm-worker","config":{"workerId":"llm-worker","queue":"default","taskType":"llm","pollIntervalMs":20,"maxPollIntervalMs":2000,"leaseSeconds":10,"heartbeatIntervalMs":2000,"maxConcurrency":5,"drainTimeoutMs":30000},"msg":"worker starting"}
+{"level":30,"time":1791216026351,"pid":57022,"hostname":"Rashul-pc","workerId":"wf-worker","taskId":"1","msg":"task completed"}
+{"level":30,"time":1791216026436,"pid":57022,"hostname":"Rashul-pc","workerId":"llm-worker","taskId":"2","msg":"task completed"}
+{"level":30,"time":1791216026493,"pid":57022,"hostname":"Rashul-pc","workerId":"wf-worker","taskId":"4","msg":"task completed"}
+{"level":30,"time":1791216026501,"pid":57022,"hostname":"Rashul-pc","workerId":"wf-worker","msg":"worker stopping — draining in-flight tasks"}
+{"level":30,"time":1791216026501,"pid":57022,"hostname":"Rashul-pc","workerId":"llm-worker","msg":"worker stopping — draining in-flight tasks"}
+{"level":30,"time":1791216026501,"pid":57022,"hostname":"Rashul-pc","workerId":"wf-worker","msg":"worker stopped"}
+{"level":30,"time":1791216026501,"pid":57022,"hostname":"Rashul-pc","workerId":"llm-worker","msg":"worker stopped"}
+{"level":30,"time":1791216026563,"pid":57022,"hostname":"Rashul-pc","workerId":"wf-worker","config":{"workerId":"wf-worker","queue":"default","taskType":"workflow","pollIntervalMs":20,"maxPollIntervalMs":2000,"leaseSeconds":10,"heartbeatIntervalMs":2000,"maxConcurrency":5,"drainTimeoutMs":30000},"msg":"worker starting"}
+{"level":30,"time":1791216026563,"pid":57022,"hostname":"Rashul-pc","workerId":"llm-worker","config":{"workerId":"llm-worker","queue":"default","taskType":"llm","pollIntervalMs":20,"maxPollIntervalMs":2000,"leaseSeconds":10,"heartbeatIntervalMs":2000,"maxConcurrency":5,"drainTimeoutMs":30000},"msg":"worker starting"}
+{"level":30,"time":1791216026621,"pid":57022,"hostname":"Rashul-pc","workerId":"wf-worker","taskId":"1","msg":"task completed"}
+{"level":30,"time":1791216026710,"pid":57022,"hostname":"Rashul-pc","workerId":"llm-worker","taskId":"2","msg":"task completed"}
+{"level":30,"time":1791216026786,"pid":70443,"hostname":"Rashul-pc","workerId":"activity-1","config":{"workerId":"activity-1","queue":"default","taskType":"activity","pollIntervalMs":20,"maxPollIntervalMs":2000,"leaseSeconds":10,"heartbeatIntervalMs":2000,"maxConcurrency":5,"drainTimeoutMs":30000},"msg":"worker starting"}
+{"level":30,"time":1791216026786,"pid":70443,"hostname":"Rashul-pc","workerId":"workflow-1","config":{"workerId":"workflow-1","queue":"default","taskType":"workflow","pollIntervalMs":20,"maxPollIntervalMs":2000,"leaseSeconds":10,"heartbeatIntervalMs":2000,"maxConcurrency":5,"drainTimeoutMs":30000},"msg":"worker starting"}
+{"level":30,"time":1791216026789,"pid":57022,"hostname":"Rashul-pc","workerId":"wf-worker","taskId":"4","msg":"task completed"}
+{"level":30,"time":1791216026808,"pid":57022,"hostname":"Rashul-pc","workerId":"wf-worker","msg":"worker stopping — draining in-flight tasks"}
+{"level":30,"time":1791216026808,"pid":57022,"hostname":"Rashul-pc","workerId":"llm-worker","msg":"worker stopping — draining in-flight tasks"}
+{"level":30,"time":1791216026808,"pid":57022,"hostname":"Rashul-pc","workerId":"wf-worker","msg":"worker stopped"}
+{"level":30,"time":1791216026808,"pid":57022,"hostname":"Rashul-pc","workerId":"llm-worker","msg":"worker stopped"}
+{"level":30,"time":1791216026824,"pid":70443,"hostname":"Rashul-pc","workerId":"workflow-1","taskId":"1","msg":"task completed"}
+{"level":30,"time":1791216026859,"pid":70443,"hostname":"Rashul-pc","workerId":"activity-1","taskId":"2","msg":"task completed"}
+{"level":30,"time":1791216026894,"pid":70443,"hostname":"Rashul-pc","workerId":"workflow-1","taskId":"4","msg":"task completed"}
+{"level":30,"time":1791216026925,"pid":70443,"hostname":"Rashul-pc","workerId":"activity-1","taskId":"5","msg":"task completed"}
+{"level":30,"time":1791216026949,"pid":70443,"hostname":"Rashul-pc","workerId":"workflow-1","taskId":"7","msg":"task completed"}
+{"level":30,"time":1791216026997,"pid":70443,"hostname":"Rashul-pc","workerId":"activity-1","taskId":"8","msg":"task completed"}
+{"level":30,"time":1791216027015,"pid":70443,"hostname":"Rashul-pc","workerId":"workflow-1","taskId":"10","msg":"task completed"}
+{"level":30,"time":1791216027066,"pid":70443,"hostname":"Rashul-pc","workerId":"activity-1","msg":"worker stopping — draining in-flight tasks"}
+{"level":30,"time":1791216027066,"pid":70443,"hostname":"Rashul-pc","workerId":"workflow-1","msg":"worker stopping — draining in-flight tasks"}
+{"level":30,"time":1791216027066,"pid":70443,"hostname":"Rashul-pc","workerId":"activity-1","msg":"worker stopped"}
+{"level":30,"time":1791216027066,"pid":70443,"hostname":"Rashul-pc","workerId":"workflow-1","msg":"worker stopped"}
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |integration| packages/worker-sdk/test/metrics.integration.test.ts > Worker: metrics counters actually increment at their real call sites > increments dequeued/completed on success and failed on a thrown handler
+AssertionError: expected '# HELP karyakram_tasks_dequeued_total…' to match /karyakram_tasks_dequeued_total\{task_…/
+
+- Expected:
+/karyakram_tasks_dequeued_total\{task_type="activity"\} 2/
+
++ Received:
+"# HELP karyakram_tasks_dequeued_total Tasks leased by dequeue(), by task type
+# TYPE karyakram_tasks_dequeued_total counter
+karyakram_tasks_dequeued_total{task_type=\"activity\"} 3
+
+# HELP karyakram_tasks_completed_total Tasks that finished successfully, by task type
+# TYPE karyakram_tasks_completed_total counter
+karyakram_tasks_completed_total{task_type=\"activity\"} 2
+
+# HELP karyakram_tasks_failed_total Tasks whose handler threw, by task type
+# TYPE karyakram_tasks_failed_total counter
+karyakram_tasks_failed_total{task_type=\"activity\"} 1
+
+# HELP karyakram_tasks_reclaimed_total Expired leases put back to pending by the reaper
+# TYPE karyakram_tasks_reclaimed_total counter
+karyakram_tasks_reclaimed_total 0
+
+# HELP karyakram_task_wait_seconds Time between a task being created and a worker leasing it — the metric LISTEN/NOTIFY exists to shrink
+# TYPE karyakram_task_wait_seconds histogram
+karyakram_task_wait_seconds_bucket{le=\"0.005\",task_type=\"activity\"} 0
+karyakram_task_wait_seconds_bucket{le=\"0.01\",task_type=\"activity\"} 0
+karyakram_task_wait_seconds_bucket{le=\"0.025\",task_type=\"activity\"} 1
+karyakram_task_wait_seconds_bucket{le=\"0.05\",task_type=\"activity\"} 1
+karyakram_task_wait_seconds_bucket{le=\"0.1\",task_type=\"activity\"} 3
+karyakram_task_wait_seconds_bucket{le=\"0.25\",task_type=\"activity\"} 3
+karyakram_task_wait_seconds_bucket{le=\"0.5\",task_type=\"activity\"} 3
+karyakram_task_wait_seconds_bucket{le=\"1\",task_type=\"activity\"} 3
+karyakram_task_wait_seconds_bucket{le=\"2.5\",task_type=\"activity\"} 3
+karyakram_task_wait_seconds_bucket{le=\"5\",task_type=\"activity\"} 3
+karyakram_task_wait_seconds_bucket{le=\"10\",task_type=\"activity\"} 3
+karyakram_task_wait_seconds_bucket{le=\"+Inf\",task_type=\"activity\"} 3
+karyakram_task_wait_seconds_sum{task_type=\"activity\"} 0.16099999999999998
+karyakram_task_wait_seconds_count{task_type=\"activity\"} 3
+
+# HELP karyakram_queue_depth Current task count by status — published only by the current leader, see docs/06-scheduler.md
+# TYPE karyakram_queue_depth gauge
+"
+
+ ❯ packages/worker-sdk/test/metrics.integration.test.ts:86:18
+     84|
+     85|     const body = await registry.metrics();
+     86|     expect(body).toMatch(/karyakram_tasks_dequeued_total\{task_type="a…
+       |                  ^
+     87|     expect(body).toMatch(/karyakram_tasks_completed_total\{task_type="…
+     88|     expect(body).toMatch(/karyakram_tasks_failed_total\{task_type="act…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 20 passed (21)
+      Tests  1 failed | 50 passed (51)
+   Start at  21:30:06
+   Duration  24.62s (transform 1.73s, setup 0ms, import 25.87s, tests 186.26s, environment 5ms)
+
+[ELIFECYCLE] Command failed with exit code 1.
+[ELIFECYCLE] Test failed. See above for more details.
