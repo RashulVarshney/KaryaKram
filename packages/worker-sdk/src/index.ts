@@ -58,3 +58,8 @@ export { createToolCallHandler } from './toolHandler';
 export type { ToolCallHandlerOptions } from './toolHandler';
 export { ToolRegistry, ToolError } from './tools';
 export type { ToolContext, ToolDefinition, ToolValidation } from './tools';
+
+export { supportTicketTriage, sampleTicket } from './examples/supportTriage';
+export type { TriageInput, TriageResult } from './examples/supportTriage';
+export { createSupportToolRegistry } from './examples/supportTools';
+export type { Customer, SentReply } from './examples/supportTools';

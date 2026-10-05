@@ -88,3 +88,7 @@ Open choices made without asking, recorded as they come up. Newest at the bottom
 20. **No component test for the React UI.** The repo has no DOM/component test infrastructure, so
     the debugger's logic lives in `packages/web/src/llmView.ts` (pure TS) and is unit-tested there;
     the JSX that renders it is covered only by typecheck and `vite build`, not by a render test.
+21. **The mock provider's "classification" is not a classification.** Its output is a deterministic
+    hash-tagged echo (`mock(<digest>): ...`), so in the demo the `category` field is that string,
+    not billing/technical/etc. The workflow, durability and side effects are real; the model
+    output is placeholder text. A real category requires `LLM_PROVIDER=anthropic`.
