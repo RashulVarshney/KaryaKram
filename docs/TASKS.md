@@ -8,6 +8,6 @@
 - [x] Phase 5: OTel spans + React debugger rendering
 - [x] Phase 6: support-ticket triage demo workflow + run script
 - [x] Phase 7: unit tests + chaos integration test
-- [ ] Phase 8: benchmark + docs/RESULTS.md + docs/results/
+- [x] Phase 8: benchmark + docs/RESULTS.md + docs/results/
 - [ ] Phase 9: README (mermaid, how to run, decisions, limitations)
 - [ ] Final report

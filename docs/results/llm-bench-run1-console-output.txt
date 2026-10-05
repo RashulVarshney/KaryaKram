@@ -1,0 +1,30 @@
+$ pnpm --filter @karyakram/bench run bench:llm
+$ dotenv -e ../.env -- tsx src/llmBench.ts
+environment: {"node":"v22.22.2","platform":"linux 7.0.0-34-generic","cpu":"13th Gen Intel(R) Core(TM) i5-13420H","logicalCores":12,"totalMemGiB":15.3,"postgresLocation":"docker container on the same machine (localhost)","provider":"MockProvider (deterministic, no network)","n":200}
+
+A. live llm_call overhead (simulated provider latency 0ms)
+  raw provider.complete()                      n=200  p50=    0.02ms  p95=    0.03ms  p99=    0.04ms  mean=    0.02ms
+  engine step (LLM_REQUESTED -> LLM_COMPLETED) n=200  p50=   11.21ms  p95=   13.17ms  p99=   15.22ms  mean=   11.03ms
+  engine workflow (Started -> Completed)       n=200  p50=   31.50ms  p95=   36.99ms  p99=   44.38ms  mean=   31.37ms
+  engine step - raw call, median difference: 11.19 ms
+
+A. live llm_call overhead (simulated provider latency 50ms)
+  raw provider.complete()                      n=200  p50=   50.51ms  p95=   50.72ms  p99=   50.85ms  mean=   50.49ms
+  engine step (LLM_REQUESTED -> LLM_COMPLETED) n=200  p50=   61.59ms  p95=   64.54ms  p99=   65.68ms  mean=   61.46ms
+  engine workflow (Started -> Completed)       n=200  p50=   84.84ms  p95=   89.12ms  p99=   90.70ms  mean=   84.55ms
+  engine step - raw call, median difference: 11.09 ms
+
+B. replay of recorded LLM steps (zero provider calls)
+  pure replay, 1 recorded steps                n=200  p50=    0.06ms  p95=    0.10ms  p99=    0.30ms  mean=    0.07ms
+  handler incl. Postgres read, 1 steps         n=50   p50=    1.05ms  p95=    1.17ms  p99=    1.29ms  mean=    1.02ms
+  pure replay, 5 recorded steps                n=200  p50=    0.09ms  p95=    0.13ms  p99=    0.77ms  mean=    0.11ms
+  handler incl. Postgres read, 5 steps         n=50   p50=    1.25ms  p95=    1.38ms  p99=    1.68ms  mean=    1.25ms
+  pure replay, 20 recorded steps               n=200  p50=    0.18ms  p95=    0.24ms  p99=    1.39ms  mean=    0.21ms
+  handler incl. Postgres read, 20 steps        n=50   p50=    1.49ms  p95=    1.75ms  p99=    2.07ms  mean=    1.49ms
+  pure replay, 50 recorded steps               n=200  p50=    0.22ms  p95=    0.30ms  p99=    1.11ms  mean=    0.26ms
+  handler incl. Postgres read, 50 steps        n=50   p50=    1.87ms  p95=    2.35ms  p99=    2.49ms  mean=    1.91ms
+
+C. concurrent throughput: 400 one-step workflows, 20 in flight
+  115.18 workflows/sec  (3.47s wall)
+
+raw results: ../docs/results/llm-bench-2026-10-05T16-28-02-671Z.json

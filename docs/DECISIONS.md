@@ -112,3 +112,16 @@ Open choices made without asking, recorded as they come up. Newest at the bottom
     ~5-8s each), so the integration test defaults to N=50 (~5 min) and is tunable with
     `KARYAKRAM_CHAOS_RUNS`. `pnpm chaos:llm` runs the same harness against a throwaway database
     and saves raw per-run JSON under `docs/results/`.
+26. **Benchmarks run against a throwaway database** (`bench/src/scratchDb.ts` creates one on the dev
+    Postgres server, migrates it, and drops it), because they TRUNCATE tables. The chaos script does
+    the same. The dev database is never touched.
+27. **Benchmark methodology fixes made before any number was recorded**, each found by checking the
+    output against common sense: (a) replay of 5 steps measured _faster_ than 1 step — a JIT cold
+    start since K=1 ran first; fixed with a global warm-up; (b) throughput of ~47 workflows/sec with
+    20 in flight was far below what a ~30 ms workflow implies — the harness's shared 5-connection
+    pool (workers + 20 polling lanes) was the bottleneck; fixed with separate 20-connection pools
+    and 5 ms completion polling, giving ~103-115/sec. The earlier numbers were discarded, not
+    recorded. Throughput is still labelled harness-limited.
+28. **Overhead is reported as a measured total, not attributed.** The ~11 ms live step cost includes
+    queue wake-up, history read, request hashing, the provider call and the persist transaction; I
+    did not instrument them separately, so `docs/RESULTS.md` does not call it "event logging cost".
