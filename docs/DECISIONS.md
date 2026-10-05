@@ -2,9 +2,10 @@
 
 Open choices made without asking, recorded as they come up. Newest at the bottom.
 
-1. **Git push.** The brief says both "push to github after every phase" and "never push". I did
-   not push: it is the outward-facing, harder-to-undo reading, and it is the more conservative
-   one. Every phase is committed locally on `feat/llm-steps`; pushing is one command for you.
+1. **Git push.** The brief said both "push after every phase" and "never push". I first treated
+   it as ambiguous and committed locally only; the user then said explicitly "push changes too
+   after every phase", so from Phase 4 onward the `feat/llm-steps` branch (never master) is pushed
+   after every phase, and phases 0-3 were pushed at that point.
 2. **Event names.** The new events use the exact names from the brief (`LLM_REQUESTED`, …).
    Existing events keep their PascalCase names; the mixed style is deliberate, not an accident.
 3. **Task list.** There is no task-list tool in this environment, so progress is ticked off in
@@ -66,3 +67,10 @@ Open choices made without asking, recorded as they come up. Newest at the bottom
     mutation made to `src` must be followed by `tsc -b` to take effect. My first exactly-once
     mutation check silently did nothing for that reason; it was redone after a rebuild and then
     failed as it should.
+17. **Retry policy reuses existing machinery.** `fail()` already did full-jitter exponential
+    backoff and dead-lettering at `max_attempts`; the only change is the `minDelaySeconds` floor,
+    factored into a pure `computeRetryDelayWithFloorSeconds` so the schedule is unit-testable.
+    The "fake clock" for the schedule test is an explicit clock object advanced by the computed
+    delays plus an injected RNG, because in production the delay is applied as `now() + interval`
+    inside Postgres and cannot be driven by a JS clock; the end-to-end tests measure real
+    `run_after` effects (a 1.5s `Retry-After` produces a >=1.45s gap between audited provider calls).

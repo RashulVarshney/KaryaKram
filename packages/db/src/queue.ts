@@ -1,5 +1,5 @@
 import type { Pool, PoolClient } from 'pg';
-import { computeRetryDelaySeconds } from './backoff';
+import { computeRetryDelayWithFloorSeconds } from './backoff';
 
 /**
  * Every queue function takes a Pool or an already-checked-out PoolClient,
@@ -293,7 +293,7 @@ export interface FailInput {
  */
 export async function fail(client: Queryable, input: FailInput): Promise<boolean> {
   const { taskId, workerId, error, attempt, minDelaySeconds = 0 } = input;
-  const delaySeconds = Math.max(computeRetryDelaySeconds(attempt), minDelaySeconds);
+  const delaySeconds = computeRetryDelayWithFloorSeconds(attempt, minDelaySeconds);
 
   const result = await client.query(
     `UPDATE tasks

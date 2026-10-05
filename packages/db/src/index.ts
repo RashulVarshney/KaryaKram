@@ -33,7 +33,7 @@ export type { AppendEventsInput, AppendEventsResult } from './eventStore';
 export { listWorkflowExecutions, getWorkflowExecution } from './workflowExecutions';
 export type { WorkflowExecutionSummary } from './workflowExecutions';
 
-export { computeRetryDelaySeconds } from './backoff';
+export { computeRetryDelaySeconds, computeRetryDelayWithFloorSeconds } from './backoff';
 export type { RetryDelayOptions } from './backoff';
 
 export { listDeadTasks, requeueDeadTask } from './dlq';
