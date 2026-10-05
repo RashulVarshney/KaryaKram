@@ -18,6 +18,7 @@ import {
 } from '@karyakram/llm';
 import type { AnyWorkflowDefinition } from './authoring';
 import { appendStepOutcome } from './fencing';
+import { llmCompletedAttributes, recordReplayedSteps, withStepSpan } from './stepSpans';
 import { maybeFault } from './faults';
 import { capResponse, loadLlmStepConfig, type LlmStepConfig } from './llmConfig';
 import type { TaskHandler } from './worker';
@@ -118,12 +119,16 @@ export function createLlmCallHandler(pool: Pool, options: LlmCallHandlerOptions)
     }
     const requested = entry.event;
 
-    const alreadyDone = history.some(
+    const outcome = history.find(
       (e) =>
         (e.event.type === 'LLM_COMPLETED' || e.event.type === 'LLM_FAILED') &&
         e.event.scheduledEventSeq === scheduledSeq,
     );
-    if (alreadyDone) return;
+    if (outcome) {
+      // Redelivery after the answer is already durable: serve it, don't call.
+      recordReplayedSteps([outcome], task.workflowId);
+      return;
+    }
 
     const failed = (error: string, code: string, retryable: boolean): LlmFailedEvent => ({
       type: 'LLM_FAILED',
@@ -135,85 +140,97 @@ export function createLlmCallHandler(pool: Pool, options: LlmCallHandlerOptions)
       attempts: task.attempt,
     });
 
-    const resolved = await resolveRequest(history, requested, registry);
-    if (!resolved.ok) {
-      await appendStepOutcome(
-        pool,
-        task,
-        scheduledSeq,
-        failed(resolved.reason, 'request_unavailable', false),
-        OUTCOME_TYPES,
-      );
-      return;
-    }
-
-    let response;
-    try {
-      response = await provider.complete(resolved.request, {
-        workflowId: task.workflowId,
-        stepId: requested.stepId,
+    return withStepSpan(
+      'llm_call',
+      {
+        'step.id': requested.stepId,
+        'workflow.id': task.workflowId,
+        replayed: false,
         attempt: task.attempt,
-      });
-    } catch (err) {
-      const providerError =
-        err instanceof LlmProviderError
-          ? err
-          : new LlmProviderError(err instanceof Error ? err.message : String(err), {
-              retryable: false,
-              code: 'unknown',
-              cause: err,
-            });
-      const exhausted = task.attempt >= task.maxAttempts;
-      logger.warn(
-        {
-          taskId: task.id,
+      },
+      async (span) => {
+        const resolved = await resolveRequest(history, requested, registry);
+        if (!resolved.ok) {
+          await appendStepOutcome(
+            pool,
+            task,
+            scheduledSeq,
+            failed(resolved.reason, 'request_unavailable', false),
+            OUTCOME_TYPES,
+          );
+          return;
+        }
+
+        let response;
+        try {
+          response = await provider.complete(resolved.request, {
+            workflowId: task.workflowId,
+            stepId: requested.stepId,
+            attempt: task.attempt,
+          });
+        } catch (err) {
+          const providerError =
+            err instanceof LlmProviderError
+              ? err
+              : new LlmProviderError(err instanceof Error ? err.message : String(err), {
+                  retryable: false,
+                  code: 'unknown',
+                  cause: err,
+                });
+          const exhausted = task.attempt >= task.maxAttempts;
+          logger.warn(
+            {
+              taskId: task.id,
+              stepId: requested.stepId,
+              attempt: task.attempt,
+              code: providerError.code,
+            },
+            'provider call failed',
+          );
+          // Retryable and attempts remain: the existing retry machinery takes over.
+          if (providerError.retryable && !exhausted) throw providerError;
+
+          await appendStepOutcome(
+            pool,
+            task,
+            scheduledSeq,
+            failed(providerError.message, providerError.code, providerError.retryable),
+            OUTCOME_TYPES,
+          );
+          // Retries exhausted: let the task dead-letter too, for operator visibility.
+          if (providerError.retryable) throw providerError;
+          return;
+        }
+
+        maybeFault('after_provider_before_persist');
+
+        const capped = capResponse(response.text, response.toolCalls, config.maxStoredBytes);
+        const completed: LlmCompletedEvent = {
+          type: 'LLM_COMPLETED',
           stepId: requested.stepId,
+          scheduledEventSeq: scheduledSeq,
+          requestHash: requested.requestHash,
+          text: capped.text,
+          toolCalls: capped.toolCalls,
+          truncated: capped.truncated,
+          model: response.model,
+          tokensIn: response.usage.inputTokens,
+          tokensOut: response.usage.outputTokens,
+          latencyMs: response.latencyMs,
+          estimatedCostUsd: estimateCostUsd(
+            response.model,
+            response.usage.inputTokens,
+            response.usage.outputTokens,
+            config.priceTable,
+          ),
           attempt: task.attempt,
-          code: providerError.code,
-        },
-        'provider call failed',
-      );
-      // Retryable and attempts remain: the existing retry machinery takes over.
-      if (providerError.retryable && !exhausted) throw providerError;
+        };
 
-      await appendStepOutcome(
-        pool,
-        task,
-        scheduledSeq,
-        failed(providerError.message, providerError.code, providerError.retryable),
-        OUTCOME_TYPES,
-      );
-      // Retries exhausted: let the task dead-letter too, for operator visibility.
-      if (providerError.retryable) throw providerError;
-      return;
-    }
-
-    maybeFault('after_provider_before_persist');
-
-    const capped = capResponse(response.text, response.toolCalls, config.maxStoredBytes);
-    const completed: LlmCompletedEvent = {
-      type: 'LLM_COMPLETED',
-      stepId: requested.stepId,
-      scheduledEventSeq: scheduledSeq,
-      requestHash: requested.requestHash,
-      text: capped.text,
-      toolCalls: capped.toolCalls,
-      truncated: capped.truncated,
-      model: response.model,
-      tokensIn: response.usage.inputTokens,
-      tokensOut: response.usage.outputTokens,
-      latencyMs: response.latencyMs,
-      estimatedCostUsd: estimateCostUsd(
-        response.model,
-        response.usage.inputTokens,
-        response.usage.outputTokens,
-        config.priceTable,
-      ),
-      attempt: task.attempt,
-    };
-
-    // Throws LeaseLostError (and writes nothing) if this worker no longer owns the task.
-    await appendStepOutcome(pool, task, scheduledSeq, completed, OUTCOME_TYPES);
-    maybeFault('after_persist');
+        // Throws LeaseLostError (and writes nothing) if this worker no longer owns the task.
+        span.setAttributes(llmCompletedAttributes(completed));
+        await appendStepOutcome(pool, task, scheduledSeq, completed, OUTCOME_TYPES);
+        maybeFault('after_persist');
+      },
+    );
   };
 }

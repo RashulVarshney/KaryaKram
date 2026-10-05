@@ -3,11 +3,9 @@ import { Background, Controls, ReactFlow, type Edge, type Node } from '@xyflow/r
 import '@xyflow/react/dist/style.css';
 import type { WorkflowState } from '@karyakram/core';
 
-export interface DagStep {
-  seq: number;
-  kind: 'activity' | 'timer';
-  label: string;
-}
+import type { DagStep } from './llmView';
+
+export type { DagStep };
 
 function statusColor(status: string | undefined): string {
   switch (status) {
@@ -17,6 +15,7 @@ function statusColor(status: string | undefined): string {
     case 'FAILED':
       return '#fecaca';
     case 'SCHEDULED':
+    case 'REQUESTED':
       return '#fef08a';
     default:
       // Not reached yet at the current scrub position.
@@ -38,7 +37,11 @@ export function DagView({ steps, state }: { steps: DagStep[]; state: WorkflowSta
         const status =
           step.kind === 'activity'
             ? state.activities[step.seq]?.status
-            : state.timers[step.seq]?.status;
+            : step.kind === 'timer'
+              ? state.timers[step.seq]?.status
+              : step.kind === 'llm'
+                ? state.llmCalls[step.seq]?.status
+                : state.toolCalls[step.seq]?.status;
         return {
           id: String(step.seq),
           position: { x: 0, y: i * 90 },

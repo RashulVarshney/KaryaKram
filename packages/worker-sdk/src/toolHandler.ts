@@ -18,6 +18,7 @@ import {
   LeaseLostError,
 } from './fencing';
 import { maybeFault } from './faults';
+import { recordReplayedSteps, withStepSpan } from './stepSpans';
 import { ToolError, type ToolRegistry } from './tools';
 import type { TaskHandler } from './worker';
 
@@ -60,12 +61,15 @@ export function createToolCallHandler(pool: Pool, options: ToolCallHandlerOption
     }
     const requested: ToolRequestedEvent = entry.event;
 
-    const alreadyDone = history.some(
+    const outcome = history.find(
       (e) =>
         (e.event.type === 'TOOL_COMPLETED' || e.event.type === 'TOOL_FAILED') &&
         e.event.scheduledEventSeq === scheduledSeq,
     );
-    if (alreadyDone) return;
+    if (outcome) {
+      recordReplayedSteps([outcome], task.workflowId);
+      return;
+    }
 
     const failed = (error: string, code: string, retryable: boolean): ToolFailedEvent => ({
       type: 'TOOL_FAILED',
@@ -104,7 +108,17 @@ export function createToolCallHandler(pool: Pool, options: ToolCallHandlerOption
     if (!tool) throw new Error(`tool "${requested.tool}" vanished from the registry`);
 
     try {
-      await executeAtomically(pool, task, requested, scheduledSeq, tool.handler);
+      await withStepSpan(
+        'tool_call',
+        {
+          'tool.name': requested.tool,
+          'step.id': requested.stepId,
+          'workflow.id': task.workflowId,
+          replayed: false,
+          attempt: task.attempt,
+        },
+        () => executeAtomically(pool, task, requested, scheduledSeq, tool.handler),
+      );
     } catch (err) {
       if (err instanceof LeaseLostError) throw err;
       const toolError =

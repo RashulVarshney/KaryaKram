@@ -5,7 +5,7 @@
 - [x] Phase 2: durable llm_call step (events, hash, replay reuse, fencing, heartbeat, size cap, redaction)
 - [x] Phase 3: durable tool_call step (registry, schema validation, tool_executions idempotency)
 - [x] Phase 4: retries (backoff + jitter, retryAfterMs, DLQ)
-- [ ] Phase 5: OTel spans + React debugger rendering
+- [x] Phase 5: OTel spans + React debugger rendering
 - [ ] Phase 6: support-ticket triage demo workflow + run script
 - [ ] Phase 7: unit tests + chaos integration test
 - [ ] Phase 8: benchmark + docs/RESULTS.md + docs/results/

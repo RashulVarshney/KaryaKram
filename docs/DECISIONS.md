@@ -74,3 +74,17 @@ Open choices made without asking, recorded as they come up. Newest at the bottom
     delays plus an injected RNG, because in production the delay is applied as `now() + interval`
     inside Postgres and cannot be driven by a JS clock; the end-to-end tests measure real
     `run_after` effects (a 1.5s `Retry-After` produces a >=1.45s gap between audited provider calls).
+18. **Pushing in this environment** goes over SSH with a one-off URL
+    (`git push git@github.com:RashulVarshney/KaryaKram.git feat/llm-steps`): the configured HTTPS
+    remote has no credentials here, and there is an SSH key on the machine. The configured remote
+    was left untouched.
+19. **What "replayed" means.** In traces: `replayed=true` on a span means the step's output was
+    served from the event log (a workflow replay passing over it, or a redelivered task finding the
+    outcome already durable) and no provider/tool call was made; `replayed=false` is the one live
+    execution. In the debugger: a completion is badged `replayed` when a later decision event
+    (`*_REQUESTED`, `ActivityScheduled`, `TimerScheduled`, `WorkflowCompleted/Failed`) exists after
+    it, because producing that decision required re-running the workflow function from the top,
+    which consumed the recorded output. This is derived from the log; no extra event is stored.
+20. **No component test for the React UI.** The repo has no DOM/component test infrastructure, so
+    the debugger's logic lives in `packages/web/src/llmView.ts` (pure TS) and is unit-tested there;
+    the JSX that renders it is covered only by typecheck and `vite build`, not by a render test.

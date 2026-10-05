@@ -10,6 +10,7 @@ import {
 import { sha256Hex } from '@karyakram/llm';
 import { appendEvents, getEvents, withTransaction, type Task } from '@karyakram/db';
 import type { AnyWorkflowDefinition } from './authoring';
+import { recordReplayedSteps } from './stepSpans';
 import { buildStoredRequest, loadLlmStepConfig, type LlmStepConfig } from './llmConfig';
 import type { TaskHandler } from './worker';
 
@@ -144,6 +145,10 @@ export function createWorkflowReplayHandler(
       }
       throw err;
     }
+
+    // Every completed LLM/tool step this replay just passed over was served
+    // from the log, not re-executed — say so in the trace.
+    recordReplayedSteps(history, task.workflowId);
 
     if (result.commands.length === 0) {
       return;
